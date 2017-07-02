@@ -1,0 +1,20 @@
+{
+  "Author": "Romanos Trechlis",
+  "BlogURL": "romanostrechlis.github.io",
+  "BlogLanguage": "en-us",
+  "BlogDescription": "This is my personal blog.",
+  "DateFormat": "2006-01-02 15:04:05",
+  "ThemePath": "./static/",
+  "BlogTitle": "RTB",
+  "NumPostsFrontPage": 10,
+  "DataSource": {
+    "Type": "git",
+    "Repository": "https://github.com/RomanosTrechlis/blog.git"
+  },
+  "DestFolder": "./public",
+  "Upload": {
+    "URL": "https://github.com/RomanosTrechlis/romanostrechlis.github.io.git",
+    "Username": "RomanosTrechlis",
+    "Password": ""
+  }
+}

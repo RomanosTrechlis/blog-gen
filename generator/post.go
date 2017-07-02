@@ -12,6 +12,9 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/RomanosTrechlis/blog-generator/config"
+	"github.com/RomanosTrechlis/blog-generator/util/fs"
 )
 
 // Post holds data for a post
@@ -45,16 +48,24 @@ func (g *PostGenerator) Generate() error {
 	t := g.Config.Template
 	fmt.Printf("\tGenerating Post: %s...\n", post.Meta.Title)
 	staticPath := fmt.Sprintf("%s%s", destination, post.Name)
-	if err := os.Mkdir(staticPath, os.ModePerm); err != nil {
+	err := os.Mkdir(staticPath, os.ModePerm)
+	if err != nil {
 		return fmt.Errorf("error creating directory at %s: %v", staticPath, err)
 	}
 	if post.ImagesDir != "" {
-		if err := copyImagesDir(post.ImagesDir, staticPath); err != nil {
+		err := copyImagesDir(post.ImagesDir, staticPath)
+		if err != nil {
 			return err
 		}
 	}
 
-	if err := writeIndexHTML(staticPath, post.Meta.Title, template.HTML(string(post.HTML)), t); err != nil {
+	err = writeIndexHTMLPost(staticPath, post.Meta.Title, template.HTML(string(post.HTML)), t, true)
+	if err != nil {
+		return err
+	}
+
+	err = copyAdditionalArtifacts(staticPath, post.Name)
+	if err != nil {
 		return err
 	}
 	fmt.Printf("\tFinished generating Post: %s...\n", post.Meta.Title)
@@ -79,9 +90,26 @@ func newPost(path string) (*Post, error) {
 	return &Post{Name: name, Meta: meta, HTML: html, ImagesDir: imagesDir, Images: images}, nil
 }
 
+func copyDir(source, path string) (err error) {
+	files, err := ioutil.ReadDir(source)
+	if err != nil {
+		return nil
+	}
+	for _, file := range files {
+		src := fmt.Sprintf("%s/%s", source, file.Name())
+		dst := fmt.Sprintf("%s/%s", path, file.Name())
+		err := fs.CopyFile(src, dst)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func copyImagesDir(source, destination string) (err error) {
 	path := fmt.Sprintf("%s/images", destination)
-	if err := os.Mkdir(path, os.ModePerm); err != nil {
+	err = os.Mkdir(path, os.ModePerm)
+	if err != nil {
 		return fmt.Errorf("error creating images directory at %s: %v", path, err)
 	}
 	files, err := ioutil.ReadDir(source)
@@ -91,7 +119,8 @@ func copyImagesDir(source, destination string) (err error) {
 	for _, file := range files {
 		src := fmt.Sprintf("%s/%s", source, file.Name())
 		dst := fmt.Sprintf("%s/%s", path, file.Name())
-		if err := copyFile(src, dst); err != nil {
+		err := fs.CopyFile(src, dst)
+		if err != nil {
 			return err
 		}
 	}
@@ -109,7 +138,7 @@ func getMeta(path string) (*Meta, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error reading yml in %s: %v", filePath, err)
 	}
-	parsedDate, err := time.Parse(dateFormat, meta.Date)
+	parsedDate, err := time.Parse(config.SiteInfo.DateFormat, meta.Date)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing date in %s: %v", filePath, err)
 	}

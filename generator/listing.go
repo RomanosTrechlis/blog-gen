@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
+	"os"
 	"strings"
+
+	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
 // ListingData holds the data for the listing page
@@ -27,12 +30,15 @@ type ListingConfig struct {
 	Posts                  []*Post
 	Template               *template.Template
 	Destination, PageTitle string
+	PageNum                int
+	MaxPageNum             int
 }
 
-const shortTemplatePath string = "static/short.html"
+var shortTemplatePath string
 
 // Generate starts the listing generation
 func (g *ListingGenerator) Generate() error {
+	shortTemplatePath = config.SiteInfo.ThemePath + "short.html"
 	posts := g.Config.Posts
 	t := g.Config.Template
 	destination := g.Config.Destination
@@ -54,16 +60,32 @@ func (g *ListingGenerator) Generate() error {
 			TimeToRead: calculateTimeToRead(string(post.HTML)),
 		}
 		block := bytes.Buffer{}
-		if err := short.Execute(&block, ld); err != nil {
+		err := short.Execute(&block, ld)
+		if err != nil {
 			return fmt.Errorf("error executing template %s: %v", shortTemplatePath, err)
 		}
 		postBlocks = append(postBlocks, block.String())
 	}
 	htmlBlocks := template.HTML(strings.Join(postBlocks, "<br />"))
-	if err := writeIndexHTML(destination, pageTitle, htmlBlocks, t); err != nil {
+	if g.Config.PageNum > 1 {
+		err := os.Mkdir(destination, os.ModePerm)
+		if err != nil {
+			return fmt.Errorf("error creating directory at %s: %v", destination, err)
+		}
+	}
+	err = writeIndexHTMLPlus(destination, pageTitle, htmlBlocks, t, false, g.Config.PageNum, g.Config.MaxPageNum)
+	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func createTags(tags []string) []*Tag {
+	var result []*Tag
+	for _, tag := range tags {
+		result = append(result, &Tag{Name: tag, Link: getTagLink(tag)})
+	}
+	return result
 }
 
 func calculateTimeToRead(input string) string {

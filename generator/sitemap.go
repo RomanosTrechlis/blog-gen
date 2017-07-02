@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/beevik/etree"
 	"os"
+
+	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
 // SitemapGenerator object
@@ -13,9 +15,10 @@ type SitemapGenerator struct {
 
 // SitemapConfig holds the config for the sitemap
 type SitemapConfig struct {
-	Posts       []*Post
-	TagPostsMap map[string][]*Post
-	Destination string
+	Posts            []*Post
+	TagPostsMap      map[string][]*Post
+	CategoryPostsMap map[string][]*Post
+	Destination      string
 }
 
 // Generate creates the sitemap
@@ -23,6 +26,7 @@ func (g *SitemapGenerator) Generate() error {
 	fmt.Println("\tGenerating Sitemap...")
 	posts := g.Config.Posts
 	tagPostsMap := g.Config.TagPostsMap
+	catPostsMap := g.Config.CategoryPostsMap
 	destination := g.Config.Destination
 	doc := etree.NewDocument()
 	doc.CreateProcInst("xml", `version="1.0" encoding="UTF-8"`)
@@ -32,14 +36,19 @@ func (g *SitemapGenerator) Generate() error {
 
 	url := urlSet.CreateElement("url")
 	loc := url.CreateElement("loc")
-	loc.SetText(blogURL)
+	loc.SetText(config.SiteInfo.BlogURL)
 
 	addURL(urlSet, "about", nil)
 	addURL(urlSet, "archive", nil)
 	addURL(urlSet, "tags", nil)
+	addURL(urlSet, "categories", nil)
 
 	for tag := range tagPostsMap {
 		addURL(urlSet, tag, nil)
+	}
+
+	for cat := range catPostsMap {
+		addURL(urlSet, cat, nil)
 	}
 
 	for _, post := range posts {
@@ -52,7 +61,8 @@ func (g *SitemapGenerator) Generate() error {
 		return fmt.Errorf("error creating file %s: %v", filePath, err)
 	}
 	f.Close()
-	if err := doc.WriteToFile(filePath); err != nil {
+	err = doc.WriteToFile(filePath)
+	if err != nil {
 		return fmt.Errorf("error writing to file %s: %v", filePath, err)
 	}
 	fmt.Println("\tFinished generating Sitemap...")
@@ -62,13 +72,13 @@ func (g *SitemapGenerator) Generate() error {
 func addURL(element *etree.Element, location string, images []string) {
 	url := element.CreateElement("url")
 	loc := url.CreateElement("loc")
-	loc.SetText(fmt.Sprintf("%s/%s/", blogURL, location))
+	loc.SetText(fmt.Sprintf("%s/%s/", config.SiteInfo.BlogURL, location))
 
 	if len(images) > 0 {
 		for _, image := range images {
 			img := url.CreateElement("image:image")
 			imgLoc := img.CreateElement("image:loc")
-			imgLoc.SetText(fmt.Sprintf("%s/%s/images/%s", blogURL, location, image))
+			imgLoc.SetText(fmt.Sprintf("%s/%s/images/%s", config.SiteInfo.BlogURL, location, image))
 		}
 	}
 }

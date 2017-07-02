@@ -2,31 +2,63 @@ package cli
 
 import (
 	"log"
-
-	"github.com/zupzup/blog-generator/config"
-	"github.com/zupzup/blog-generator/datasource"
-	"github.com/zupzup/blog-generator/generator"
+	"github.com/RomanosTrechlis/blog-generator/config"
+	"github.com/RomanosTrechlis/blog-generator/datasource"
+	"github.com/RomanosTrechlis/blog-generator/util/fs"
+	"github.com/RomanosTrechlis/blog-generator/generator"
+	"github.com/RomanosTrechlis/blog-generator/endpoint"
 )
 
-// Run runs the application
-func Run() {
-	if config.RepoURL == "" {
-		log.Fatal("please provide a repository URL using the -repo flag")
-	}
-	ds := datasource.New()
-	dirs, err := ds.Fetch(config.RepoURL, config.TmpFolder)
+// ReadConfig creates object holding site information
+func ReadConfig() {
+	config.SiteInfo = config.NewSiteInformation()
+}
 
+// Download fetches content from the data source
+func Download() {
+	if config.ConfigFile == "" {
+		log.Fatal("please provide a configuration file -configfile flag")
+	}
+
+	var err error
+	switch config.SiteInfo.DataSource.Type {
+	case "git":
+		ds := datasource.NewGitDataSource()
+		_, err = ds.Fetch(config.SiteInfo.DataSource.Repository,
+			config.SiteInfo.TempFolder)
+	case "local":
+		ds := datasource.NewLocalDataSource()
+		_, err = ds.Fetch(config.SiteInfo.DataSource.Repository,
+			config.SiteInfo.TempFolder)
+	case "":
+		log.Fatal("please provide a datasource in the configuration file")
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
+}
 
-	g := generator.New(&generator.SiteConfig{
+// Generate creates site's content
+func Generate() {
+	dirs, err := fs.GetContentFolders(config.SiteInfo.TempFolder)
+	if err != nil {
+		log.Fatal(err)
+	}
+	g := generator.NewSiteGenerator(&generator.SiteConfig{
 		Sources:     dirs,
-		Destination: config.DestFolder,
+		Destination: config.SiteInfo.DestFolder,
 	})
 
 	err = g.Generate()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
+// Upload uploads content to endpoint
+func Upload() {
+	e := endpoint.NewGitEndpoint()
+	err := e.Upload(config.SiteInfo.Upload.URL)
 	if err != nil {
 		log.Fatal(err)
 	}

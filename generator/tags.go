@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"html/template"
 	"sort"
-	"strings"
+
+	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
 // Tag holds the data for a Tag
@@ -30,24 +31,28 @@ type TagsConfig struct {
 	Destination string
 }
 
-const tagsTemplatePath string = "static/tags.html"
+var tagsTemplatePath string
 
 // Generate creates the tags page
 func (g *TagsGenerator) Generate() error {
 	fmt.Println("\tGenerating Tags...")
+	tagsTemplatePath = config.SiteInfo.ThemePath + "tags.html"
 	tagPostsMap := g.Config.TagPostsMap
 	t := g.Config.Template
 	destination := g.Config.Destination
 	tagsPath := fmt.Sprintf("%s/tags", destination)
-	if err := clearAndCreateDestination(tagsPath); err != nil {
+	err := clearAndCreateDestination(tagsPath)
+	if err != nil {
 		return err
 	}
-	if err := generateTagIndex(tagPostsMap, t, tagsPath); err != nil {
+	err = generateTagIndex(tagPostsMap, t, tagsPath)
+	if err != nil {
 		return err
 	}
 	for tag, tagPosts := range tagPostsMap {
 		tagPagePath := fmt.Sprintf("%s/%s", tagsPath, tag)
-		if err := generateTagPage(tag, tagPosts, t, tagPagePath); err != nil {
+		err := generateTagPage(tag, tagPosts, t, tagPagePath)
+		if err != nil {
 			return err
 		}
 	}
@@ -66,17 +71,20 @@ func generateTagIndex(tagPostsMap map[string][]*Post, t *template.Template, dest
 	}
 	sort.Sort(ByCountDesc(tags))
 	buf := bytes.Buffer{}
-	if err := tmpl.Execute(&buf, tags); err != nil {
+	err = tmpl.Execute(&buf, tags)
+	if err != nil {
 		return fmt.Errorf("error executing template %s: %v", tagsTemplatePath, err)
 	}
-	if err := writeIndexHTML(destination, "Tags", template.HTML(buf.String()), t); err != nil {
+	err = writeIndexHTML(destination, "Tags", template.HTML(buf.String()), t)
+	if err != nil {
 		return err
 	}
 	return nil
 }
 
 func generateTagPage(tag string, posts []*Post, t *template.Template, destination string) error {
-	if err := clearAndCreateDestination(destination); err != nil {
+	err := clearAndCreateDestination(destination)
+	if err != nil {
 		return err
 	}
 	lg := ListingGenerator{&ListingConfig{
@@ -85,22 +93,12 @@ func generateTagPage(tag string, posts []*Post, t *template.Template, destinatio
 		Destination: destination,
 		PageTitle:   tag,
 	}}
-	if err := lg.Generate(); err != nil {
+
+	err = lg.Generate()
+	if err != nil {
 		return err
 	}
 	return nil
-}
-
-func createTags(tags []string) []*Tag {
-	var result []*Tag
-	for _, tag := range tags {
-		result = append(result, &Tag{Name: tag, Link: getTagLink(tag)})
-	}
-	return result
-}
-
-func getTagLink(tag string) string {
-	return fmt.Sprintf("/tags/%s/", strings.ToLower(tag))
 }
 
 func (t ByCountDesc) Len() int {

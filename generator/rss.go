@@ -5,6 +5,8 @@ import (
 	"github.com/beevik/etree"
 	"os"
 	"time"
+
+	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
 // RSSGenerator object
@@ -32,19 +34,20 @@ func (g *RSSGenerator) Generate() error {
 	rss.CreateAttr("version", "2.0")
 	channel := rss.CreateElement("channel")
 
-	channel.CreateElement("title").SetText(blogTitle)
-	channel.CreateElement("link").SetText(blogURL)
-	channel.CreateElement("language").SetText(blogLanguage)
-	channel.CreateElement("description").SetText(blogDescription)
+	channel.CreateElement("title").SetText(config.SiteInfo.BlogTitle)
+	channel.CreateElement("link").SetText(config.SiteInfo.BlogURL)
+	channel.CreateElement("language").SetText(config.SiteInfo.BlogLanguage)
+	channel.CreateElement("description").SetText(config.SiteInfo.BlogDescription)
 	channel.CreateElement("lastBuildDate").SetText(time.Now().Format(rssDateFormat))
 
 	atomLink := channel.CreateElement("atom:link")
-	atomLink.CreateAttr("href", fmt.Sprintf("%s/index.xml", blogURL))
+	atomLink.CreateAttr("href", fmt.Sprintf("%s/index.xml", config.SiteInfo.BlogURL))
 	atomLink.CreateAttr("rel", "self")
 	atomLink.CreateAttr("type", "application/rss+xml")
 
 	for _, post := range posts {
-		if err := addItem(channel, post, fmt.Sprintf("%s/%s/", blogURL, post.Name[1:])); err != nil {
+		err := addItem(channel, post, fmt.Sprintf("%s/%s/", config.SiteInfo.BlogURL, post.Name[1:]))
+		if err != nil {
 			return err
 		}
 	}
@@ -55,7 +58,8 @@ func (g *RSSGenerator) Generate() error {
 		return fmt.Errorf("error creating file %s: %v", filePath, err)
 	}
 	f.Close()
-	if err := doc.WriteToFile(filePath); err != nil {
+	err = doc.WriteToFile(filePath)
+	if err != nil {
 		return fmt.Errorf("error writing to file %s: %v", filePath, err)
 	}
 	fmt.Println("\tFinished generating RSS...")
@@ -68,7 +72,7 @@ func addItem(element *etree.Element, post *Post, path string) error {
 	item.CreateElement("title").SetText(meta.Title)
 	item.CreateElement("link").SetText(path)
 	item.CreateElement("guid").SetText(path)
-	pubDate, err := time.Parse(dateFormat, meta.Date)
+	pubDate, err := time.Parse(config.SiteInfo.DateFormat, meta.Date)
 	if err != nil {
 		return fmt.Errorf("error parsing date %s: %v", meta.Date, err)
 	}
