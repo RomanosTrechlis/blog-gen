@@ -37,7 +37,7 @@ var catTemplatePath string
 // Generate creates the categories page
 func (g *CategoriesGenerator) Generate() error {
 	fmt.Println("\tGenerating Categories...")
-	catTemplatePath = config.SiteInfo.ThemePath + "categories.html"
+	catTemplatePath = config.SiteInfo.ThemeFolder + "categories.html"
 	catPostsMap := g.Config.CatPostsMap
 	t := g.Config.Template
 	destination := g.Config.Destination

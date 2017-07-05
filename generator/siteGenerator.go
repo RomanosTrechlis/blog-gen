@@ -35,7 +35,7 @@ var templatePath string
 
 // Generate starts the static blog generation
 func (g *SiteGenerator) Generate() error {
-	templatePath = config.SiteInfo.ThemePath + "template.html"
+	templatePath = config.SiteInfo.ThemeFolder + "template.html"
 	fmt.Println("Generating Site...")
 	sources := g.Config.Sources
 	destination := g.Config.Destination
@@ -143,12 +143,12 @@ func runTasks(posts []*Post, t *template.Template, destination string) error {
 	}}
 	// statics
 	fileToDestination := map[string]string{
-		config.SiteInfo.ThemePath + "favicon.ico": fmt.Sprintf("%s/favicon.ico", destination),
-		config.SiteInfo.ThemePath + "robots.txt":  fmt.Sprintf("%s/robots.txt", destination),
-		config.SiteInfo.ThemePath + "about.png":   fmt.Sprintf("%s/about.png", destination),
+		config.SiteInfo.ThemeFolder + "favicon.ico": fmt.Sprintf("%s/favicon.ico", destination),
+		config.SiteInfo.ThemeFolder + "robots.txt":  fmt.Sprintf("%s/robots.txt", destination),
+		config.SiteInfo.ThemeFolder + "about.png":   fmt.Sprintf("%s/about.png", destination),
 	}
 	templateToFile := map[string]string{
-		config.SiteInfo.ThemePath + "about.html": fmt.Sprintf("%s/about/index.html", destination),
+		config.SiteInfo.ThemeFolder + "about.html": fmt.Sprintf("%s/about/index.html", destination),
 	}
 	statg := StaticsGenerator{&StaticsConfig{
 		FileToDestination: fileToDestination,

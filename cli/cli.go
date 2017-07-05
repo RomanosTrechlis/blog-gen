@@ -20,6 +20,7 @@ func Download() {
 		log.Fatal("please provide a configuration file -configfile flag")
 	}
 
+	// handle blog posts repository
 	var err error
 	switch config.SiteInfo.DataSource.Type {
 	case "git":
@@ -36,6 +37,25 @@ func Download() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// handle theme repository
+	switch config.SiteInfo.Theme.Type {
+	case "git":
+		ds := datasource.NewGitDataSource()
+		_, err = ds.Fetch(config.SiteInfo.Theme.Repository,
+			config.SiteInfo.ThemeFolder)
+	case "local":
+		ds := datasource.NewLocalDataSource()
+		_, err = ds.Fetch(config.SiteInfo.Theme.Repository,
+			config.SiteInfo.ThemeFolder)
+	case "":
+		log.Fatal("please provide a datasource in the configuration file")
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+
+
 }
 
 // Generate creates site's content

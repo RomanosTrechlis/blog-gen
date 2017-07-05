@@ -4,14 +4,19 @@
   "BlogLanguage": "en-us",
   "BlogDescription": "This is my personal blog.",
   "DateFormat": "2006-01-02 15:04:05",
-  "ThemePath": "./static/",
-  "BlogTitle": "RTB",
+  "Theme": {
+    "Type": "git",
+    "Repository": "https://github.com/RomanosTrechlis/BlogThemeBlueSimple.git"
+  },
+  "BlogTitle": "Romanos-Antonios Trechlis",
   "NumPostsFrontPage": 10,
   "DataSource": {
     "Type": "git",
     "Repository": "https://github.com/RomanosTrechlis/blog.git"
   },
   "DestFolder": "./public",
+  "TempFolder": "./tmp",
+  "ThemeFolder": "./static/",
   "Upload": {
     "URL": "https://github.com/RomanosTrechlis/romanostrechlis.github.io.git",
     "Username": "RomanosTrechlis",

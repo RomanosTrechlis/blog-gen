@@ -19,7 +19,11 @@ type SiteInformation struct {
 	BlogLanguage      string `json:BlogLanguage`
 	BlogDescription   string `json:BlogDescription`
 	DateFormat        string `json:DateFormat`
-	ThemePath         string `json:TemplatePath`
+	Theme			  struct {
+		Repository string `json:Repository`
+		Type string `json:Type`
+	}
+	ThemeFolder       string `json:ThemeFolder`
 	BlogTitle         string `json:BlogTitle`
 	NumPostsFrontPage int    `json:NumPostsFrontPage`
 	DataSource        struct {
@@ -55,6 +59,9 @@ func fillDefaultValues(siteInfo SiteInformation) SiteInformation {
 	}
 	if siteInfo.DestFolder == "" {
 		siteInfo.DestFolder = "./public"
+	}
+	if siteInfo.ThemeFolder == "" {
+		siteInfo.DestFolder = "./static"
 	}
 	if siteInfo.NumPostsFrontPage == 0 {
 		siteInfo.NumPostsFrontPage = 10

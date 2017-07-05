@@ -36,7 +36,7 @@ var tagsTemplatePath string
 // Generate creates the tags page
 func (g *TagsGenerator) Generate() error {
 	fmt.Println("\tGenerating Tags...")
-	tagsTemplatePath = config.SiteInfo.ThemePath + "tags.html"
+	tagsTemplatePath = config.SiteInfo.ThemeFolder + "tags.html"
 	tagPostsMap := g.Config.TagPostsMap
 	t := g.Config.Template
 	destination := g.Config.Destination

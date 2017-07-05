@@ -31,17 +31,26 @@ The configuration file looks like this:
   "Author": "Romanos Trechlis",
   "BlogURL": "romanostrechlis.github.io",
   "BlogLanguage": "en-us",
-  "BlogDescription": "Desc",
+  "BlogDescription": "This is my personal blog.",
   "DateFormat": "2006-01-02 15:04:05",
-  "ThemePath": "./static/",
-  "BlogTitle": "RTB",
+  "Theme": {
+    "Type": "git",
+    "Repository": "https://github.com/RomanosTrechlis/BlogThemeBlueSimple.git"
+  },
+  "BlogTitle": "Romanos-Antonios Trechlis",
   "NumPostsFrontPage": 10,
   "DataSource": {
     "Type": "git",
     "Repository": "https://github.com/RomanosTrechlis/blog.git"
   },
+  "DestFolder": "./public",
   "TempFolder": "./tmp",
-  "DestFolder": "./public"
+  "ThemeFolder": "./static/",
+  "Upload": {
+    "URL": "https://github.com/RomanosTrechlis/romanostrechlis.github.io.git",
+    "Username": "RomanosTrechlis",
+    "Password": ""
+  }
 }
 ```
 
@@ -52,6 +61,7 @@ The DataSource Type can also be *local* and the Repository can be a folder
     "Type": "local",
     "Repository": "C:/Users/Romanos/Desktop/testLocal/blog/"
 }
+```
 
 ## 2. Use of cli to break functionality
 

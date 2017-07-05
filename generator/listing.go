@@ -38,7 +38,7 @@ var shortTemplatePath string
 
 // Generate starts the listing generation
 func (g *ListingGenerator) Generate() error {
-	shortTemplatePath = config.SiteInfo.ThemePath + "short.html"
+	shortTemplatePath = config.SiteInfo.ThemeFolder + "short.html"
 	posts := g.Config.Posts
 	t := g.Config.Template
 	destination := g.Config.Destination
