@@ -146,6 +146,7 @@ func runTasks(posts []*Post, t *template.Template, destination string) error {
 		config.SiteInfo.ThemeFolder + "favicon.ico": fmt.Sprintf("%s/favicon.ico", destination),
 		config.SiteInfo.ThemeFolder + "robots.txt":  fmt.Sprintf("%s/robots.txt", destination),
 		config.SiteInfo.ThemeFolder + "about.png":   fmt.Sprintf("%s/about.png", destination),
+		config.SiteInfo.ThemeFolder + "style.min.css":   fmt.Sprintf("%s/style.min.css", destination),
 	}
 	templateToFile := map[string]string{
 		config.SiteInfo.ThemeFolder + "about.html": fmt.Sprintf("%s/about/index.html", destination),
