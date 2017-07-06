@@ -27,28 +27,32 @@ func (g *StaticsGenerator) Generate() error {
 	fileToDestination := g.Config.FileToDestination
 	templateToFile := g.Config.TemplateToFile
 	t := g.Config.Template
-	for k, v := range fileToDestination {
-		err := createFolderIfNotExist(getFolder(v))
-		if err != nil {
-			return err
-		}
-		err = fs.CopyFile(k, v)
-		if err != nil {
-			return err
+	if len(fileToDestination) > 0 {
+		for k, v := range fileToDestination {
+			err := createFolderIfNotExist(getFolder(v))
+			if err != nil {
+				return err
+			}
+			err = fs.CopyFile(k, v)
+			if err != nil {
+				return err
+			}
 		}
 	}
-	for k, v := range templateToFile {
-		err := createFolderIfNotExist(getFolder(v))
-		if err != nil {
-			return err
-		}
-		content, err := ioutil.ReadFile(k)
-		if err != nil {
-			return fmt.Errorf("error reading file %s: %v", k, err)
-		}
-		err = writeIndexHTML(getFolder(v), getTitle(k), template.HTML(content), t)
-		if err != nil {
-			return err
+	if len(templateToFile) > 0 {
+		for k, v := range templateToFile {
+			err := createFolderIfNotExist(getFolder(v))
+			if err != nil {
+				return err
+			}
+			content, err := ioutil.ReadFile(k)
+			if err != nil {
+				return fmt.Errorf("error reading file %s: %v", k, err)
+			}
+			err = writeIndexHTML(getFolder(v), getTitle(k), template.HTML(content), t)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	fmt.Println("\tFinished copying statics...")

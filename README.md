@@ -26,7 +26,7 @@ Additionaly, because I change blog posts on my computer and then push them to gi
 
 The configuration file looks like this:
 
-```javascript
+```JSON
 {
   "Author": "Romanos Trechlis",
   "BlogURL": "romanostrechlis.github.io",
@@ -46,6 +46,38 @@ The configuration file looks like this:
   "DestFolder": "./public",
   "TempFolder": "./tmp",
   "ThemeFolder": "./static/",
+  "StaticPages": [
+    {
+      "File": "favicon.ico",
+      "To": "favicon.ico",
+      "IsTemplate": false
+    },
+    {
+      "File": "robots.txt",
+      "To": "robots.txt",
+      "IsTemplate": false
+    },
+    {
+      "File": "about.png",
+      "To": "about.png",
+      "IsTemplate": false
+    },
+    {
+      "File": "style.min.css",
+      "To": "style.min.css",
+      "IsTemplate": false
+    },
+    {
+      "File": "google.min.css",
+      "To": "google.min.css",
+      "IsTemplate": false
+    },
+    {
+      "File": "about.html",
+      "To": "about/index.html",
+      "IsTemplate": true
+    }
+  ],
   "Upload": {
     "URL": "https://github.com/RomanosTrechlis/romanostrechlis.github.io.git",
     "Username": "RomanosTrechlis",
@@ -56,7 +88,7 @@ The configuration file looks like this:
 
 The DataSource Type can also be *local* and the Repository can be a folder
 
-```javascript
+```JSON
 {
     "Type": "local",
     "Repository": "C:/Users/Romanos/Desktop/testLocal/blog/"

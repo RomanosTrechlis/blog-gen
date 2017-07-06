@@ -37,6 +37,13 @@ type SiteInformation struct {
 	}
 	TempFolder string `json:TempFolder`
 	DestFolder string `json:DestFolder`
+	StaticPages []StaticPage `json:StaticPages`
+}
+
+type StaticPage struct {
+	File string `json:File`
+	To string `json:To`
+	IsTemplate bool `json:IsTemplate`
 }
 
 func NewSiteInformation() SiteInformation {

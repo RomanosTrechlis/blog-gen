@@ -142,15 +142,24 @@ func runTasks(posts []*Post, t *template.Template, destination string) error {
 		Destination: destination,
 	}}
 	// statics
-	fileToDestination := map[string]string{
+	/*fileToDestination := map[string]string{
 		config.SiteInfo.ThemeFolder + "favicon.ico": fmt.Sprintf("%s/favicon.ico", destination),
 		config.SiteInfo.ThemeFolder + "robots.txt":  fmt.Sprintf("%s/robots.txt", destination),
 		config.SiteInfo.ThemeFolder + "about.png":   fmt.Sprintf("%s/about.png", destination),
 		config.SiteInfo.ThemeFolder + "style.min.css":   fmt.Sprintf("%s/style.min.css", destination),
+	}*/
+	fileToDestination := make(map[string]string)
+	templateToFile := make(map[string]string)
+	for _, row := range config.SiteInfo.StaticPages {
+		if row.IsTemplate {
+			templateToFile[config.SiteInfo.ThemeFolder + row.File] = fmt.Sprintf("%s/%s", destination, row.To)
+			continue
+		}
+		fileToDestination[config.SiteInfo.ThemeFolder + row.File] = fmt.Sprintf("%s/%s", destination, row.To)
 	}
-	templateToFile := map[string]string{
-		config.SiteInfo.ThemeFolder + "about.html": fmt.Sprintf("%s/about/index.html", destination),
-	}
+	/*templateToFile := map[string]string{
+		//config.SiteInfo.ThemeFolder + "about.html": fmt.Sprintf("%s/about/index.html", destination),
+	}*/
 	statg := StaticsGenerator{&StaticsConfig{
 		FileToDestination: fileToDestination,
 		TemplateToFile:    templateToFile,
