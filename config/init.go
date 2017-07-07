@@ -46,10 +46,10 @@ type StaticPage struct {
 	IsTemplate bool `json:IsTemplate`
 }
 
-func NewSiteInformation() SiteInformation {
-	data, err := ioutil.ReadFile(ConfigFile)
+func NewSiteInformation(configFile string) SiteInformation {
+	data, err := ioutil.ReadFile(configFile)
 	if err != nil {
-		log.Fatal("error accessing directory %s: %v", ConfigFile, err)
+		log.Fatal("error accessing directory %s: %v", configFile, err)
 	}
 	siteInfo := SiteInformation{}
 	siteInfo.ParseJSON(data)

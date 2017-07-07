@@ -26,7 +26,7 @@ func init() {
 
 func main() {
 	flag.Parse()
-	cli.ReadConfig()
+	cli.ReadConfig(config.ConfigFile)
 
 	if download {
 		cli.Download()

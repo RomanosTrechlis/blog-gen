@@ -10,8 +10,8 @@ import (
 )
 
 // ReadConfig creates object holding site information
-func ReadConfig() {
-	config.SiteInfo = config.NewSiteInformation()
+func ReadConfig(configFile string) {
+	config.SiteInfo = config.NewSiteInformation(configFile)
 }
 
 // Download fetches content from the data source
