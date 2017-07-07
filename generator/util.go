@@ -20,7 +20,7 @@ func clearAndCreateDestination(path string) error {
 func getTemplate(path string) (*template.Template, error) {
 	t, err := template.ParseFiles(path)
 	if err != nil {
-		return nil, fmt.Errorf("error reading template %s: %v", templatePath, err)
+		return nil, fmt.Errorf("error reading template %s: %v", path, err)
 	}
 	return t, nil
 }

@@ -37,7 +37,7 @@ type PostGenerator struct {
 type PostConfig struct {
 	Post                    *Post
 	Destination, DateFormat string
-	TempFolder, PageTitle   string
+	TempFolder 						  string
 	ThemeFolder, BlogTitle  string
 	Author, BlogURL         string
 	Template                *template.Template
