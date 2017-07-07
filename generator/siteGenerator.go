@@ -145,6 +145,7 @@ func runTasks(posts []*Post, t *template.Template, siteInfo config.SiteInformati
 		BlogTitle:   siteInfo.BlogTitle,
 		Author:      siteInfo.Author,
 		BlogURL:     siteInfo.BlogURL,
+		ThemeFolder: siteInfo.ThemeFolder,
 	}}
 
 	// sitemap
