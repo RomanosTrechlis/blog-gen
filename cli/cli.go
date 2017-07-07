@@ -10,27 +10,24 @@ import (
 )
 
 // ReadConfig creates object holding site information
-func ReadConfig(configFile string) {
+func ReadConfig(configFile string) (siteInfo config.SiteInformation) {
 	config.SiteInfo = config.NewSiteInformation(configFile)
+	return config.SiteInfo
 }
 
 // Download fetches content from the data source
-func Download() {
-	if config.ConfigFile == "" {
-		log.Fatal("please provide a configuration file -configfile flag")
-	}
-
+func Download(siteInfo config.SiteInformation) {
 	// handle blog posts repository
 	var err error
-	switch config.SiteInfo.DataSource.Type {
+	switch siteInfo.DataSource.Type {
 	case "git":
 		ds := datasource.NewGitDataSource()
-		_, err = ds.Fetch(config.SiteInfo.DataSource.Repository,
-			config.SiteInfo.TempFolder)
+		_, err = ds.Fetch(siteInfo.DataSource.Repository,
+			siteInfo.TempFolder)
 	case "local":
 		ds := datasource.NewLocalDataSource()
-		_, err = ds.Fetch(config.SiteInfo.DataSource.Repository,
-			config.SiteInfo.TempFolder)
+		_, err = ds.Fetch(siteInfo.DataSource.Repository,
+			siteInfo.TempFolder)
 	case "":
 		log.Fatal("please provide a datasource in the configuration file")
 	}
@@ -39,34 +36,32 @@ func Download() {
 	}
 
 	// handle theme repository
-	switch config.SiteInfo.Theme.Type {
+	switch siteInfo.Theme.Type {
 	case "git":
 		ds := datasource.NewGitDataSource()
-		_, err = ds.Fetch(config.SiteInfo.Theme.Repository,
-			config.SiteInfo.ThemeFolder)
+		_, err = ds.Fetch(siteInfo.Theme.Repository,
+			siteInfo.ThemeFolder)
 	case "local":
 		ds := datasource.NewLocalDataSource()
-		_, err = ds.Fetch(config.SiteInfo.Theme.Repository,
-			config.SiteInfo.ThemeFolder)
+		_, err = ds.Fetch(siteInfo.Theme.Repository,
+			siteInfo.ThemeFolder)
 	case "":
 		log.Fatal("please provide a datasource in the configuration file")
 	}
 	if err != nil {
 		log.Fatal(err)
 	}
-
-
 }
 
 // Generate creates site's content
-func Generate() {
-	dirs, err := fs.GetContentFolders(config.SiteInfo.TempFolder)
+func Generate(siteInfo config.SiteInformation) {
+	dirs, err := fs.GetContentFolders(siteInfo.TempFolder)
 	if err != nil {
 		log.Fatal(err)
 	}
 	g := generator.NewSiteGenerator(&generator.SiteConfig{
 		Sources:     dirs,
-		Destination: config.SiteInfo.DestFolder,
+		Destination: siteInfo.DestFolder,
 	})
 
 	err = g.Generate()
@@ -76,9 +71,9 @@ func Generate() {
 }
 
 // Upload uploads content to endpoint
-func Upload() {
+func Upload(siteInfo config.SiteInformation) {
 	e := endpoint.NewGitEndpoint()
-	err := e.Upload(config.SiteInfo.Upload.URL)
+	err := e.Upload(siteInfo.Upload.URL)
 	if err != nil {
 		log.Fatal(err)
 	}
