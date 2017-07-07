@@ -5,8 +5,6 @@ import (
 	"github.com/beevik/etree"
 	"os"
 	"time"
-
-	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
 // RSSGenerator object
@@ -16,8 +14,13 @@ type RSSGenerator struct {
 
 // RSSConfig holds the configuration for an RSS feed
 type RSSConfig struct {
-	Posts       []*Post
-	Destination string
+	Posts           []*Post
+	Destination     string
+	BlogTitle       string
+	BlogURL         string
+	BlogLanguage    string
+	BlogDescription string
+	DateFormat      string
 }
 
 const rssDateFormat string = "02 Jan 2006 15:04 -0700"
@@ -34,19 +37,19 @@ func (g *RSSGenerator) Generate() error {
 	rss.CreateAttr("version", "2.0")
 	channel := rss.CreateElement("channel")
 
-	channel.CreateElement("title").SetText(config.SiteInfo.BlogTitle)
-	channel.CreateElement("link").SetText(config.SiteInfo.BlogURL)
-	channel.CreateElement("language").SetText(config.SiteInfo.BlogLanguage)
-	channel.CreateElement("description").SetText(config.SiteInfo.BlogDescription)
+	channel.CreateElement("title").SetText(g.Config.BlogTitle)
+	channel.CreateElement("link").SetText(g.Config.BlogURL)
+	channel.CreateElement("language").SetText(g.Config.BlogLanguage)
+	channel.CreateElement("description").SetText(g.Config.BlogDescription)
 	channel.CreateElement("lastBuildDate").SetText(time.Now().Format(rssDateFormat))
 
 	atomLink := channel.CreateElement("atom:link")
-	atomLink.CreateAttr("href", fmt.Sprintf("%s/index.xml", config.SiteInfo.BlogURL))
+	atomLink.CreateAttr("href", fmt.Sprintf("%s/index.xml", g.Config.BlogURL))
 	atomLink.CreateAttr("rel", "self")
 	atomLink.CreateAttr("type", "application/rss+xml")
 
 	for _, post := range posts {
-		err := addItem(channel, post, fmt.Sprintf("%s/%s/", config.SiteInfo.BlogURL, post.Name[1:]))
+		err := addItem(channel, post, fmt.Sprintf("%s/%s/", g.Config.BlogURL, post.Name[1:]), g.Config.DateFormat)
 		if err != nil {
 			return err
 		}
@@ -66,13 +69,13 @@ func (g *RSSGenerator) Generate() error {
 	return nil
 }
 
-func addItem(element *etree.Element, post *Post, path string) error {
+func addItem(element *etree.Element, post *Post, path, dateFormat string) error {
 	meta := post.Meta
 	item := element.CreateElement("item")
 	item.CreateElement("title").SetText(meta.Title)
 	item.CreateElement("link").SetText(path)
 	item.CreateElement("guid").SetText(path)
-	pubDate, err := time.Parse(config.SiteInfo.DateFormat, meta.Date)
+	pubDate, err := time.Parse(dateFormat, meta.Date)
 	if err != nil {
 		return fmt.Errorf("error parsing date %s: %v", meta.Date, err)
 	}

@@ -2,11 +2,11 @@ package main
 
 import (
 	"flag"
+	"github.com/RomanosTrechlis/blog-generator/cli"
+	"github.com/RomanosTrechlis/blog-generator/config"
 	"log"
 	"net/http"
 	"strconv"
-	"github.com/RomanosTrechlis/blog-generator/config"
-	"github.com/RomanosTrechlis/blog-generator/cli"
 )
 
 var server bool

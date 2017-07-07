@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"github.com/beevik/etree"
 	"os"
-
-	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
 // SitemapGenerator object
@@ -19,6 +17,7 @@ type SitemapConfig struct {
 	TagPostsMap      map[string][]*Post
 	CategoryPostsMap map[string][]*Post
 	Destination      string
+	BlogURL          string
 }
 
 // Generate creates the sitemap
@@ -36,23 +35,23 @@ func (g *SitemapGenerator) Generate() error {
 
 	url := urlSet.CreateElement("url")
 	loc := url.CreateElement("loc")
-	loc.SetText(config.SiteInfo.BlogURL)
+	loc.SetText(g.Config.BlogURL)
 
-	addURL(urlSet, "about", nil)
-	addURL(urlSet, "archive", nil)
-	addURL(urlSet, "tags", nil)
-	addURL(urlSet, "categories", nil)
+	addURL(urlSet, "about", g.Config.BlogURL, nil)
+	addURL(urlSet, "archive", g.Config.BlogURL, nil)
+	addURL(urlSet, "tags", g.Config.BlogURL, nil)
+	addURL(urlSet, "categories", g.Config.BlogURL, nil)
 
 	for tag := range tagPostsMap {
-		addURL(urlSet, tag, nil)
+		addURL(urlSet, tag, g.Config.BlogURL, nil)
 	}
 
 	for cat := range catPostsMap {
-		addURL(urlSet, cat, nil)
+		addURL(urlSet, cat, g.Config.BlogURL, nil)
 	}
 
 	for _, post := range posts {
-		addURL(urlSet, post.Name[1:], post.Images)
+		addURL(urlSet, post.Name[1:], g.Config.BlogURL, post.Images)
 	}
 
 	filePath := fmt.Sprintf("%s/sitemap.xml", destination)
@@ -69,16 +68,16 @@ func (g *SitemapGenerator) Generate() error {
 	return nil
 }
 
-func addURL(element *etree.Element, location string, images []string) {
+func addURL(element *etree.Element, location, blogUrl string, images []string) {
 	url := element.CreateElement("url")
 	loc := url.CreateElement("loc")
-	loc.SetText(fmt.Sprintf("%s/%s/", config.SiteInfo.BlogURL, location))
+	loc.SetText(fmt.Sprintf("%s/%s/", blogUrl, location))
 
 	if len(images) > 0 {
 		for _, image := range images {
 			img := url.CreateElement("image:image")
 			imgLoc := img.CreateElement("image:loc")
-			imgLoc.SetText(fmt.Sprintf("%s/%s/images/%s", config.SiteInfo.BlogURL, location, image))
+			imgLoc.SetText(fmt.Sprintf("%s/%s/images/%s", blogUrl, location, image))
 		}
 	}
 }

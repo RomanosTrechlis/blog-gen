@@ -2,11 +2,11 @@ package generator
 
 import (
 	"fmt"
+	"github.com/RomanosTrechlis/blog-generator/util/fs"
 	"html/template"
 	"io/ioutil"
 	"os"
 	"strings"
-	"github.com/RomanosTrechlis/blog-generator/util/fs"
 )
 
 // StaticsGenerator object
@@ -19,6 +19,8 @@ type StaticsConfig struct {
 	FileToDestination map[string]string
 	TemplateToFile    map[string]string
 	Template          *template.Template
+	BlogTitle         string
+	Author, BlogURL   string
 }
 
 // Generate creates the static pages
@@ -49,7 +51,8 @@ func (g *StaticsGenerator) Generate() error {
 			if err != nil {
 				return fmt.Errorf("error reading file %s: %v", k, err)
 			}
-			err = writeIndexHTML(getFolder(v), getTitle(k), template.HTML(content), t)
+			err = writeIndexHTML(getFolder(v), getTitle(k), g.Config.Author, g.Config.BlogURL, g.Config.BlogTitle,
+				template.HTML(content), t)
 			if err != nil {
 				return err
 			}

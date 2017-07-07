@@ -1,12 +1,12 @@
 package cli
 
 import (
-	"log"
 	"github.com/RomanosTrechlis/blog-generator/config"
 	"github.com/RomanosTrechlis/blog-generator/datasource"
-	"github.com/RomanosTrechlis/blog-generator/util/fs"
-	"github.com/RomanosTrechlis/blog-generator/generator"
 	"github.com/RomanosTrechlis/blog-generator/endpoint"
+	"github.com/RomanosTrechlis/blog-generator/generator"
+	"github.com/RomanosTrechlis/blog-generator/util/fs"
+	"log"
 )
 
 // ReadConfig creates object holding site information
@@ -60,8 +60,8 @@ func Generate(siteInfo config.SiteInformation) {
 		log.Fatal(err)
 	}
 	g := generator.NewSiteGenerator(&generator.SiteConfig{
-		Sources:     dirs,
-		Destination: siteInfo.DestFolder,
+		Sources:  dirs,
+		SiteInfo: siteInfo,
 	})
 
 	err = g.Generate()

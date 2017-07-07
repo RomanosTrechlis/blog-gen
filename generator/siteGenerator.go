@@ -22,8 +22,8 @@ type SiteGenerator struct {
 
 // SiteConfig holds the sources and destination folder
 type SiteConfig struct {
-	Sources     []string
-	Destination string
+	Sources  []string
+	SiteInfo config.SiteInformation
 }
 
 // New creates a new SiteGenerator
@@ -35,10 +35,10 @@ var templatePath string
 
 // Generate starts the static blog generation
 func (g *SiteGenerator) Generate() error {
-	templatePath = config.SiteInfo.ThemeFolder + "template.html"
+	templatePath = g.Config.SiteInfo.ThemeFolder + "template.html"
 	fmt.Println("Generating Site...")
 	sources := g.Config.Sources
-	destination := g.Config.Destination
+	destination := g.Config.SiteInfo.DestFolder
 	err := clearAndCreateDestination(destination)
 	if err != nil {
 		return err
@@ -53,14 +53,14 @@ func (g *SiteGenerator) Generate() error {
 	}
 	var posts []*Post
 	for _, path := range sources {
-		post, err := newPost(path)
+		post, err := newPost(path, g.Config.SiteInfo.DateFormat)
 		if err != nil {
 			return err
 		}
 		posts = append(posts, post)
 	}
 	sort.Sort(ByDateDesc(posts))
-	err = runTasks(posts, t, destination)
+	err = runTasks(posts, t, g.Config.SiteInfo)
 	if err != nil {
 		return err
 	}
@@ -68,12 +68,13 @@ func (g *SiteGenerator) Generate() error {
 	return nil
 }
 
-func runTasks(posts []*Post, t *template.Template, destination string) error {
+func runTasks(posts []*Post, t *template.Template, siteInfo config.SiteInformation) error {
 	var wg sync.WaitGroup
 	finished := make(chan bool, 1)
 	errors := make(chan error, 1)
 	pool := make(chan struct{}, 50)
 	generators := []Generator{}
+	destination := siteInfo.DestFolder
 
 	//posts
 	for _, post := range posts {
@@ -81,14 +82,19 @@ func runTasks(posts []*Post, t *template.Template, destination string) error {
 			Post:        post,
 			Destination: destination,
 			Template:    t,
+			DateFormat:  siteInfo.DateFormat,
+			TempFolder:  siteInfo.TempFolder,
+			BlogTitle:   siteInfo.BlogTitle,
+			Author:      siteInfo.Author,
+			BlogURL:     siteInfo.BlogURL,
 		}}
 		generators = append(generators, &pg)
 	}
 	tagPostsMap := createTagPostsMap(posts)
 
 	// frontpage
-	paging := config.SiteInfo.NumPostsFrontPage
-	numOfPages := getNumberOfPages(posts)
+	paging := siteInfo.NumPostsFrontPage
+	numOfPages := getNumberOfPages(posts, paging)
 	for i := 0; i < numOfPages; i++ {
 		to := destination
 		if i != 0 {
@@ -105,6 +111,7 @@ func runTasks(posts []*Post, t *template.Template, destination string) error {
 			PageTitle:   "",
 			PageNum:     i + 1,
 			MaxPageNum:  numOfPages,
+			ThemeFolder: siteInfo.ThemeFolder,
 		}})
 	}
 
@@ -114,12 +121,20 @@ func runTasks(posts []*Post, t *template.Template, destination string) error {
 		Template:    t,
 		Destination: fmt.Sprintf("%s/archive", destination),
 		PageTitle:   "Archive",
+		ThemeFolder: siteInfo.ThemeFolder,
+		BlogTitle:   siteInfo.BlogTitle,
+		Author:      siteInfo.Author,
+		BlogURL:     siteInfo.BlogURL,
 	}}
 	// tags
 	tg := TagsGenerator{&TagsConfig{
 		TagPostsMap: tagPostsMap,
 		Template:    t,
 		Destination: destination,
+		BlogTitle:   siteInfo.BlogTitle,
+		Author:      siteInfo.Author,
+		BlogURL:     siteInfo.BlogURL,
+		ThemeFolder: siteInfo.ThemeFolder,
 	}}
 	// categories
 	catPostsMap := createCatPostsMap(posts)
@@ -127,6 +142,9 @@ func runTasks(posts []*Post, t *template.Template, destination string) error {
 		CatPostsMap: catPostsMap,
 		Template:    t,
 		Destination: destination,
+		BlogTitle:   siteInfo.BlogTitle,
+		Author:      siteInfo.Author,
+		BlogURL:     siteInfo.BlogURL,
 	}}
 
 	// sitemap
@@ -135,31 +153,28 @@ func runTasks(posts []*Post, t *template.Template, destination string) error {
 		TagPostsMap:      tagPostsMap,
 		CategoryPostsMap: catPostsMap,
 		Destination:      destination,
+		BlogURL:          siteInfo.BlogURL,
 	}}
 	// rss
 	rg := RSSGenerator{&RSSConfig{
-		Posts:       posts,
-		Destination: destination,
+		Posts:           posts,
+		Destination:     destination,
+		BlogTitle:       siteInfo.BlogTitle,
+		BlogURL:         siteInfo.BlogURL,
+		BlogLanguage:    siteInfo.BlogLanguage,
+		BlogDescription: siteInfo.BlogDescription,
+		DateFormat:      siteInfo.DateFormat,
 	}}
 	// statics
-	/*fileToDestination := map[string]string{
-		config.SiteInfo.ThemeFolder + "favicon.ico": fmt.Sprintf("%s/favicon.ico", destination),
-		config.SiteInfo.ThemeFolder + "robots.txt":  fmt.Sprintf("%s/robots.txt", destination),
-		config.SiteInfo.ThemeFolder + "about.png":   fmt.Sprintf("%s/about.png", destination),
-		config.SiteInfo.ThemeFolder + "style.min.css":   fmt.Sprintf("%s/style.min.css", destination),
-	}*/
 	fileToDestination := make(map[string]string)
 	templateToFile := make(map[string]string)
-	for _, row := range config.SiteInfo.StaticPages {
+	for _, row := range siteInfo.StaticPages {
 		if row.IsTemplate {
-			templateToFile[config.SiteInfo.ThemeFolder + row.File] = fmt.Sprintf("%s/%s", destination, row.To)
+			templateToFile[siteInfo.ThemeFolder+row.File] = fmt.Sprintf("%s/%s", destination, row.To)
 			continue
 		}
-		fileToDestination[config.SiteInfo.ThemeFolder + row.File] = fmt.Sprintf("%s/%s", destination, row.To)
+		fileToDestination[siteInfo.ThemeFolder+row.File] = fmt.Sprintf("%s/%s", destination, row.To)
 	}
-	/*templateToFile := map[string]string{
-		//config.SiteInfo.ThemeFolder + "about.html": fmt.Sprintf("%s/about/index.html", destination),
-	}*/
 	statg := StaticsGenerator{&StaticsConfig{
 		FileToDestination: fileToDestination,
 		TemplateToFile:    templateToFile,
@@ -197,15 +212,16 @@ func runTasks(posts []*Post, t *template.Template, destination string) error {
 	return nil
 }
 
-func writeIndexHTML(path, pageTitle string, content template.HTML, t *template.Template) error {
-	return writeIndexHTMLPlus(path, pageTitle, content, t, false, 0, 0)
+func writeIndexHTML(path, pageTitle, author, blogURL, blogTitle string, content template.HTML, t *template.Template) error {
+	return writeIndexHTMLPlus(path, pageTitle, author, blogURL, blogTitle, content, t, false, 0, 0)
 }
 
-func writeIndexHTMLPost(path, pageTitle string, content template.HTML, t *template.Template, isPost bool) error {
-	return writeIndexHTMLPlus(path, pageTitle, content, t, isPost, 0, 0)
+func writeIndexHTMLPost(path, pageTitle, author, blogURL, blogTitle string, content template.HTML, t *template.Template, isPost bool) error {
+	return writeIndexHTMLPlus(path, pageTitle, author, blogURL, blogTitle, content, t, isPost, 0, 0)
 }
 
-func writeIndexHTMLPlus(path, pageTitle string, content template.HTML, t *template.Template, isPost bool, page, maxPage int) error {
+func writeIndexHTMLPlus(path, pageTitle, author, blogURL, blogTitle string, content template.HTML, t *template.Template,
+	isPost bool, page, maxPage int) error {
 	filePath := fmt.Sprintf("%s/index.html", path)
 	f, err := os.Create(filePath)
 	if err != nil {
@@ -219,16 +235,16 @@ func writeIndexHTMLPlus(path, pageTitle string, content template.HTML, t *templa
 		next = 0
 	}
 	td := IndexData{
-		Name:          config.SiteInfo.Author,
+		Name:          author,
 		Year:          time.Now().Year(),
-		HTMLTitle:     getHTMLTitle(pageTitle),
+		HTMLTitle:     getHTMLTitle(pageTitle, blogTitle),
 		PageTitle:     pageTitle,
 		Content:       content,
-		CanonicalLink: buildCanonicalLink(path, config.SiteInfo.BlogURL),
+		CanonicalLink: buildCanonicalLink(path, blogURL),
 		PageNum:       page,
 		NextPageNum:   next,
 		PrevPageNum:   prev,
-		URL:           buildCanonicalLink(path, config.SiteInfo.BlogURL),
+		URL:           buildCanonicalLink(path, blogURL),
 		IsPost:        isPost,
 	}
 
@@ -243,16 +259,16 @@ func writeIndexHTMLPlus(path, pageTitle string, content template.HTML, t *templa
 	return nil
 }
 
-func copyAdditionalArtifacts(path, postName string) error {
-	src := config.SiteInfo.TempFolder + postName + "/artifacts/"
+func copyAdditionalArtifacts(path, postName, tempFolder string) error {
+	src := tempFolder + postName + "/artifacts/"
 	return copyDir(src, path)
 }
 
-func getHTMLTitle(pageTitle string) string {
+func getHTMLTitle(pageTitle, blogTitle string) string {
 	if pageTitle == "" {
-		return config.SiteInfo.BlogTitle
+		return blogTitle
 	}
-	return fmt.Sprintf("%s - %s", pageTitle, config.SiteInfo.BlogTitle)
+	return fmt.Sprintf("%s - %s", pageTitle, blogTitle)
 }
 
 func createTagPostsMap(posts []*Post) map[string][]*Post {
@@ -285,15 +301,15 @@ func createCatPostsMap(posts []*Post) map[string][]*Post {
 	return result
 }
 
-func getNumOfPagesOnFrontpage(posts []*Post) int {
-	if len(posts) < config.SiteInfo.NumPostsFrontPage {
+func getNumOfPagesOnFrontpage(posts []*Post, postsPerPage int) int {
+	if len(posts) < postsPerPage {
 		return len(posts)
 	}
-	return config.SiteInfo.NumPostsFrontPage
+	return postsPerPage
 }
 
-func getNumberOfPages(posts []*Post) int {
-	res := float64(len(posts)) / float64(config.SiteInfo.NumPostsFrontPage)
+func getNumberOfPages(posts []*Post, postsPerPage int) int {
+	res := float64(len(posts)) / float64(postsPerPage)
 	r, _ := strconv.Atoi(fmt.Sprintf("%.0f", math.Ceil(res)))
 	return r
 }

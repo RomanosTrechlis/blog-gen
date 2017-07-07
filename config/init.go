@@ -14,14 +14,14 @@ var SiteInfo SiteInformation
 
 // SiteInformation contains the information inside ConfigFile
 type SiteInformation struct {
-	Author            string `json:Author`
-	BlogURL           string `json:BlogURL`
-	BlogLanguage      string `json:BlogLanguage`
-	BlogDescription   string `json:BlogDescription`
-	DateFormat        string `json:DateFormat`
-	Theme			  struct {
+	Author          string `json:Author`
+	BlogURL         string `json:BlogURL`
+	BlogLanguage    string `json:BlogLanguage`
+	BlogDescription string `json:BlogDescription`
+	DateFormat      string `json:DateFormat`
+	Theme           struct {
 		Repository string `json:Repository`
-		Type string `json:Type`
+		Type       string `json:Type`
 	}
 	ThemeFolder       string `json:ThemeFolder`
 	BlogTitle         string `json:BlogTitle`
@@ -35,15 +35,15 @@ type SiteInformation struct {
 		Username string `json:Username`
 		Password string `json:Password`
 	}
-	TempFolder string `json:TempFolder`
-	DestFolder string `json:DestFolder`
+	TempFolder  string       `json:TempFolder`
+	DestFolder  string       `json:DestFolder`
 	StaticPages []StaticPage `json:StaticPages`
 }
 
 type StaticPage struct {
-	File string `json:File`
-	To string `json:To`
-	IsTemplate bool `json:IsTemplate`
+	File       string `json:File`
+	To         string `json:To`
+	IsTemplate bool   `json:IsTemplate`
 }
 
 func NewSiteInformation(configFile string) SiteInformation {

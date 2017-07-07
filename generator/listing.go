@@ -6,8 +6,6 @@ import (
 	"html/template"
 	"os"
 	"strings"
-
-	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
 // ListingData holds the data for the listing page
@@ -30,6 +28,8 @@ type ListingConfig struct {
 	Posts                  []*Post
 	Template               *template.Template
 	Destination, PageTitle string
+	ThemeFolder, BlogTitle string
+	Author, BlogURL        string
 	PageNum                int
 	MaxPageNum             int
 }
@@ -38,7 +38,7 @@ var shortTemplatePath string
 
 // Generate starts the listing generation
 func (g *ListingGenerator) Generate() error {
-	shortTemplatePath = config.SiteInfo.ThemeFolder + "short.html"
+	shortTemplatePath = g.Config.ThemeFolder + "short.html"
 	posts := g.Config.Posts
 	t := g.Config.Template
 	destination := g.Config.Destination
@@ -73,7 +73,8 @@ func (g *ListingGenerator) Generate() error {
 			return fmt.Errorf("error creating directory at %s: %v", destination, err)
 		}
 	}
-	err = writeIndexHTMLPlus(destination, pageTitle, htmlBlocks, t, false, g.Config.PageNum, g.Config.MaxPageNum)
+	err = writeIndexHTMLPlus(destination, pageTitle, g.Config.Author, g.Config.BlogURL, g.Config.BlogTitle, htmlBlocks,
+		t, false, g.Config.PageNum, g.Config.MaxPageNum)
 	if err != nil {
 		return err
 	}

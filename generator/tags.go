@@ -6,7 +6,6 @@ import (
 	"html/template"
 	"sort"
 
-	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
 // Tag holds the data for a Tag
@@ -26,9 +25,12 @@ type TagsGenerator struct {
 
 // TagsConfig holds the tag's config
 type TagsConfig struct {
-	TagPostsMap map[string][]*Post
-	Template    *template.Template
-	Destination string
+	TagPostsMap     map[string][]*Post
+	Template        *template.Template
+	Destination     string
+	ThemeFolder     string
+	BlogTitle       string
+	Author, BlogURL string
 }
 
 var tagsTemplatePath string
@@ -36,7 +38,7 @@ var tagsTemplatePath string
 // Generate creates the tags page
 func (g *TagsGenerator) Generate() error {
 	fmt.Println("\tGenerating Tags...")
-	tagsTemplatePath = config.SiteInfo.ThemeFolder + "tags.html"
+	tagsTemplatePath = g.Config.ThemeFolder + "tags.html"
 	tagPostsMap := g.Config.TagPostsMap
 	t := g.Config.Template
 	destination := g.Config.Destination
@@ -45,7 +47,7 @@ func (g *TagsGenerator) Generate() error {
 	if err != nil {
 		return err
 	}
-	err = generateTagIndex(tagPostsMap, t, tagsPath)
+	err = generateTagIndex(tagPostsMap, t, tagsPath, g.Config.Author, g.Config.BlogURL, g.Config.BlogTitle)
 	if err != nil {
 		return err
 	}
@@ -60,7 +62,7 @@ func (g *TagsGenerator) Generate() error {
 	return nil
 }
 
-func generateTagIndex(tagPostsMap map[string][]*Post, t *template.Template, destination string) error {
+func generateTagIndex(tagPostsMap map[string][]*Post, t *template.Template, destination, author, blogURL, blogTitle string) error {
 	tmpl, err := getTemplate(tagsTemplatePath)
 	if err != nil {
 		return err
@@ -75,7 +77,7 @@ func generateTagIndex(tagPostsMap map[string][]*Post, t *template.Template, dest
 	if err != nil {
 		return fmt.Errorf("error executing template %s: %v", tagsTemplatePath, err)
 	}
-	err = writeIndexHTML(destination, "Tags", template.HTML(buf.String()), t)
+	err = writeIndexHTML(destination, "Tags", author, blogURL, blogTitle, template.HTML(buf.String()), t)
 	if err != nil {
 		return err
 	}

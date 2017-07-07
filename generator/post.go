@@ -13,7 +13,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/RomanosTrechlis/blog-generator/config"
 	"github.com/RomanosTrechlis/blog-generator/util/fs"
 )
 
@@ -36,9 +35,12 @@ type PostGenerator struct {
 
 // PostConfig holds the post's configuration
 type PostConfig struct {
-	Post        *Post
-	Destination string
-	Template    *template.Template
+	Post                    *Post
+	Destination, DateFormat string
+	TempFolder, PageTitle   string
+	ThemeFolder, BlogTitle  string
+	Author, BlogURL         string
+	Template                *template.Template
 }
 
 // Generate generates a post
@@ -59,12 +61,13 @@ func (g *PostGenerator) Generate() error {
 		}
 	}
 
-	err = writeIndexHTMLPost(staticPath, post.Meta.Title, template.HTML(string(post.HTML)), t, true)
+	err = writeIndexHTMLPost(staticPath, post.Meta.Title, g.Config.Author, g.Config.BlogURL, g.Config.BlogURL,
+		template.HTML(string(post.HTML)), t, true)
 	if err != nil {
 		return err
 	}
 
-	err = copyAdditionalArtifacts(staticPath, post.Name)
+	err = copyAdditionalArtifacts(staticPath, post.Name, g.Config.TempFolder)
 	if err != nil {
 		return err
 	}
@@ -72,8 +75,8 @@ func (g *PostGenerator) Generate() error {
 	return nil
 }
 
-func newPost(path string) (*Post, error) {
-	meta, err := getMeta(path)
+func newPost(path, dateFormat string) (*Post, error) {
+	meta, err := getMeta(path, dateFormat)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +130,7 @@ func copyImagesDir(source, destination string) (err error) {
 	return nil
 }
 
-func getMeta(path string) (*Meta, error) {
+func getMeta(path, dateFormat string) (*Meta, error) {
 	filePath := fmt.Sprintf("%s/meta.yml", path)
 	metaraw, err := ioutil.ReadFile(filePath)
 	if err != nil {
@@ -138,7 +141,7 @@ func getMeta(path string) (*Meta, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error reading yml in %s: %v", filePath, err)
 	}
-	parsedDate, err := time.Parse(config.SiteInfo.DateFormat, meta.Date)
+	parsedDate, err := time.Parse(dateFormat, meta.Date)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing date in %s: %v", filePath, err)
 	}

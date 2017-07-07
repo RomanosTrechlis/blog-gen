@@ -6,8 +6,6 @@ import (
 	"html/template"
 	"sort"
 	"strings"
-
-	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
 // Category holds the data for a category
@@ -27,9 +25,12 @@ type CategoriesGenerator struct {
 
 // CategoriesConfig holds the category's config
 type CategoriesConfig struct {
-	CatPostsMap map[string][]*Post
-	Template    *template.Template
-	Destination string
+	CatPostsMap     map[string][]*Post
+	Template        *template.Template
+	Destination     string
+	ThemeFolder     string
+	BlogTitle       string
+	Author, BlogURL string
 }
 
 var catTemplatePath string
@@ -37,7 +38,7 @@ var catTemplatePath string
 // Generate creates the categories page
 func (g *CategoriesGenerator) Generate() error {
 	fmt.Println("\tGenerating Categories...")
-	catTemplatePath = config.SiteInfo.ThemeFolder + "categories.html"
+	catTemplatePath = g.Config.ThemeFolder + "categories.html"
 	catPostsMap := g.Config.CatPostsMap
 	t := g.Config.Template
 	destination := g.Config.Destination
@@ -46,7 +47,7 @@ func (g *CategoriesGenerator) Generate() error {
 	if err != nil {
 		return err
 	}
-	err = generateCatIndex(catPostsMap, t, catsPath)
+	err = generateCatIndex(catPostsMap, t, catsPath, g.Config.Author, g.Config.BlogURL, g.Config.BlogTitle)
 	if err != nil {
 		return err
 	}
@@ -61,7 +62,7 @@ func (g *CategoriesGenerator) Generate() error {
 	return nil
 }
 
-func generateCatIndex(catPostsMap map[string][]*Post, t *template.Template, destination string) error {
+func generateCatIndex(catPostsMap map[string][]*Post, t *template.Template, destination, author, blogURL, blogTitle string) error {
 	tmpl, err := getTemplate(catTemplatePath)
 	if err != nil {
 		return err
@@ -76,7 +77,7 @@ func generateCatIndex(catPostsMap map[string][]*Post, t *template.Template, dest
 	if err != nil {
 		return fmt.Errorf("error executing template %s: %v", catTemplatePath, err)
 	}
-	err = writeIndexHTML(destination, "Categories", template.HTML(buf.String()), t)
+	err = writeIndexHTML(destination, "Categories", author, blogURL, blogTitle, template.HTML(buf.String()), t)
 	if err != nil {
 		return err
 	}
