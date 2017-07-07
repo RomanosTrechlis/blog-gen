@@ -53,7 +53,7 @@ func (g *CategoriesGenerator) Generate() error {
 	}
 	for cat, catPosts := range catPostsMap {
 		catPagePath := fmt.Sprintf("%s/%s", catsPath, cat)
-		err = generateCatPage(cat, catPosts, t, catPagePath)
+		err = generateCatPage(cat, catPosts, t, catPagePath, g.Config.Author, g.Config.BlogURL, g.Config.BlogTitle, g.Config.ThemeFolder)
 		if err != nil {
 			return err
 		}
@@ -84,7 +84,7 @@ func generateCatIndex(catPostsMap map[string][]*Post, t *template.Template, dest
 	return nil
 }
 
-func generateCatPage(cat string, posts []*Post, t *template.Template, destination string) error {
+func generateCatPage(cat string, posts []*Post, t *template.Template, destination, author, blogURL, blogTitle, themeFolder string) error {
 	err := clearAndCreateDestination(destination)
 	if err != nil {
 		return err
@@ -94,6 +94,10 @@ func generateCatPage(cat string, posts []*Post, t *template.Template, destinatio
 		Template:    t,
 		Destination: destination,
 		PageTitle:   cat,
+		BlogTitle:   blogTitle,
+		Author:      author,
+		BlogURL:     blogURL,
+		ThemeFolder: themeFolder,
 	}}
 	err = lg.Generate()
 	if err != nil {

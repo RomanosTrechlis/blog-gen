@@ -53,7 +53,7 @@ func (g *TagsGenerator) Generate() error {
 	}
 	for tag, tagPosts := range tagPostsMap {
 		tagPagePath := fmt.Sprintf("%s/%s", tagsPath, tag)
-		err := generateTagPage(tag, tagPosts, t, tagPagePath)
+		err := generateTagPage(tag, tagPosts, t, tagPagePath, g.Config.Author, g.Config.BlogURL, g.Config.BlogTitle, g.Config.ThemeFolder)
 		if err != nil {
 			return err
 		}
@@ -84,7 +84,7 @@ func generateTagIndex(tagPostsMap map[string][]*Post, t *template.Template, dest
 	return nil
 }
 
-func generateTagPage(tag string, posts []*Post, t *template.Template, destination string) error {
+func generateTagPage(tag string, posts []*Post, t *template.Template, destination, author, blogURL, blogTitle, themeFolder string) error {
 	err := clearAndCreateDestination(destination)
 	if err != nil {
 		return err
@@ -94,6 +94,10 @@ func generateTagPage(tag string, posts []*Post, t *template.Template, destinatio
 		Template:    t,
 		Destination: destination,
 		PageTitle:   tag,
+		BlogTitle:   blogTitle,
+		Author:      author,
+		BlogURL:     blogURL,
+		ThemeFolder: themeFolder,
 	}}
 
 	err = lg.Generate()
