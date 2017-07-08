@@ -10,13 +10,13 @@ import (
 )
 
 // ReadConfig creates object holding site information
-func ReadConfig(configFile string) (siteInfo config.SiteInformation) {
+func ReadConfig(configFile string) (siteInfo *config.SiteInformation) {
 	config.SiteInfo = config.NewSiteInformation(configFile)
-	return config.SiteInfo
+	return &config.SiteInfo
 }
 
 // Download fetches content from the data source
-func Download(siteInfo config.SiteInformation) {
+func Download(siteInfo *config.SiteInformation) {
 	// handle blog posts repository
 	var err error
 	switch siteInfo.DataSource.Type {
@@ -54,7 +54,7 @@ func Download(siteInfo config.SiteInformation) {
 }
 
 // Generate creates site's content
-func Generate(siteInfo config.SiteInformation) {
+func Generate(siteInfo *config.SiteInformation) {
 	dirs, err := fs.GetContentFolders(siteInfo.TempFolder)
 	if err != nil {
 		log.Fatal(err)
@@ -71,7 +71,7 @@ func Generate(siteInfo config.SiteInformation) {
 }
 
 // Upload uploads content to endpoint
-func Upload(siteInfo config.SiteInformation) {
+func Upload(siteInfo *config.SiteInformation) {
 	e := endpoint.NewGitEndpoint()
 	err := e.Upload(siteInfo.Upload.URL)
 	if err != nil {

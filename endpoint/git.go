@@ -13,17 +13,17 @@ import (
 type GitEndpoint struct{}
 
 // NewGitEndpoint creates a new GitEndpoint
-func NewGitEndpoint() Endpoint {
+func NewGitEndpoint() (e Endpoint) {
 	return &GitEndpoint{}
 }
 
 // Upload uploads the site to a git repository
 // todo: push fails
-func (ds *GitEndpoint) Upload(to string) error {
+func (ds *GitEndpoint) Upload(to string) (err error) {
 	fmt.Println("Uploading Site...")
 	path := config.SiteInfo.DestFolder
 	dest := config.SiteInfo.DestFolder + "_upload"
-	err := fs.CreateFolderIfNotExist(dest)
+	err = fs.CreateFolderIfNotExist(dest)
 	if err != nil {
 		return err
 	}
@@ -86,7 +86,7 @@ func (ds *GitEndpoint) Upload(to string) error {
 	return nil
 }
 
-func createUrlWithCred(to string) (string, error) {
+func createUrlWithCred(to string) (url string, err error) {
 	t := strings.Split(to, "://")
 	if len(t) != 2 {
 		return "", fmt.Errorf("couldn't process git url")

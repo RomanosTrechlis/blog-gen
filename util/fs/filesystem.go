@@ -36,8 +36,7 @@ func CopyFile(src, dst string) (err error) {
 	return nil
 }
 
-func GetContentFolders(path string) ([]string, error) {
-	var result []string
+func GetContentFolders(path string) (result []string, err error) {
 	dir, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("error accessing directory %s: %v", path, err)
@@ -85,8 +84,8 @@ func CopyDir(source, path string) (err error) {
 	return nil
 }
 
-func CreateFolderIfNotExist(path string) error {
-	_, err := os.Stat(path)
+func CreateFolderIfNotExist(path string) (err error) {
+	_, err = os.Stat(path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			err = os.Mkdir(path, os.ModePerm)
@@ -100,7 +99,7 @@ func CreateFolderIfNotExist(path string) error {
 	return nil
 }
 
-func ClearFolder(path string) error {
+func ClearFolder(path string) (err error) {
 	dir, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("error accessing directory %s: %v", path, err)

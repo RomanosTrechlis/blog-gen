@@ -12,6 +12,9 @@ var ConfigFile string
 // SiteInfo contains all the variables for the site
 var SiteInfo SiteInformation
 
+type BlogInformation interface {
+}
+
 // SiteInformation contains the information inside ConfigFile
 type SiteInformation struct {
 	Author          string `json:Author`
@@ -46,17 +49,16 @@ type StaticPage struct {
 	IsTemplate bool   `json:IsTemplate`
 }
 
-func NewSiteInformation(configFile string) SiteInformation {
+func NewSiteInformation(configFile string) (siteInfo SiteInformation) {
 	data, err := ioutil.ReadFile(configFile)
 	if err != nil {
 		log.Fatal("error accessing directory %s: %v", configFile, err)
 	}
-	siteInfo := SiteInformation{}
 	siteInfo.ParseJSON(data)
 	return fillDefaultValues(siteInfo)
 }
 
-func (c *SiteInformation) ParseJSON(b []byte) error {
+func (c *SiteInformation) ParseJSON(b []byte) (err error) {
 	return json.Unmarshal(b, &c)
 }
 

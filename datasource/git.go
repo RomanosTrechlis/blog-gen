@@ -11,14 +11,14 @@ import (
 type GitDataSource struct{}
 
 // NewGitDataSource creates a new GitDataSource
-func NewGitDataSource() DataSource {
+func NewGitDataSource() (ds DataSource) {
 	return &GitDataSource{}
 }
 
 // Fetch creates the output folder, clears it and clones the repository there
-func (ds *GitDataSource) Fetch(from, to string) ([]string, error) {
+func (ds *GitDataSource) Fetch(from, to string) (dirs []string, err error) {
 	fmt.Printf("Fetching data from %s into %s...\n", from, to)
-	err := fs.CreateFolderIfNotExist(to)
+	err = fs.CreateFolderIfNotExist(to)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func (ds *GitDataSource) Fetch(from, to string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	dirs, err := fs.GetContentFolders(to)
+	dirs, err = fs.GetContentFolders(to)
 	if err != nil {
 		return nil, err
 	}
@@ -38,12 +38,12 @@ func (ds *GitDataSource) Fetch(from, to string) ([]string, error) {
 	return dirs, nil
 }
 
-func cloneRepo(path, repositoryURL string) error {
+func cloneRepo(path, repositoryURL string) (err error) {
 	cmdName := "git"
 	initArgs := []string{"init", "."}
 	cmd := exec.Command(cmdName, initArgs...)
 	cmd.Dir = path
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		return fmt.Errorf("error initializing git repository at %s: %v", path, err)
 	}

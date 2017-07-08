@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
 // StaticsGenerator object
@@ -19,12 +20,11 @@ type StaticsConfig struct {
 	FileToDestination map[string]string
 	TemplateToFile    map[string]string
 	Template          *template.Template
-	BlogTitle         string
-	Author, BlogURL   string
+	SiteInfo					*config.SiteInformation
 }
 
 // Generate creates the static pages
-func (g *StaticsGenerator) Generate() error {
+func (g *StaticsGenerator) Generate() (err error) {
 	fmt.Println("\tCopying Statics...")
 	fileToDestination := g.Config.FileToDestination
 	templateToFile := g.Config.TemplateToFile
@@ -51,8 +51,7 @@ func (g *StaticsGenerator) Generate() error {
 			if err != nil {
 				return fmt.Errorf("error reading file %s: %v", k, err)
 			}
-			err = writeIndexHTML(getFolder(v), getTitle(k), g.Config.Author, g.Config.BlogURL, g.Config.BlogTitle,
-				template.HTML(content), t)
+			err = writeIndexHTML(getFolder(v), getTitle(k), template.HTML(content), t, g.Config.SiteInfo)
 			if err != nil {
 				return err
 			}
@@ -62,8 +61,8 @@ func (g *StaticsGenerator) Generate() error {
 	return nil
 }
 
-func createFolderIfNotExist(path string) error {
-	_, err := os.Stat(path)
+func createFolderIfNotExist(path string) (err error) {
+	_, err = os.Stat(path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			err = os.Mkdir(path, os.ModePerm)
@@ -77,7 +76,8 @@ func createFolderIfNotExist(path string) error {
 	return nil
 }
 
-func getTitle(path string) string {
+func getTitle(path string) (title string) {
 	fileName := path[strings.LastIndex(path, "/")+1 : strings.LastIndex(path, ".")]
-	return fmt.Sprintf("%s%s", strings.ToUpper(string(fileName[0])), fileName[1:])
+	title = fmt.Sprintf("%s%s", strings.ToUpper(string(fileName[0])), fileName[1:])
+	return title
 }

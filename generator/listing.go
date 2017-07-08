@@ -3,6 +3,7 @@ package generator
 import (
 	"bytes"
 	"fmt"
+	"github.com/RomanosTrechlis/blog-generator/config"
 	"html/template"
 	"os"
 	"strings"
@@ -15,7 +16,7 @@ type ListingData struct {
 	Short      string
 	Link       string
 	TimeToRead string
-	Tags       []*Tag
+	Tags       []Tag
 }
 
 // ListingGenerator Object
@@ -27,9 +28,8 @@ type ListingGenerator struct {
 type ListingConfig struct {
 	Posts                  []*Post
 	Template               *template.Template
+	SiteInfo               *config.SiteInformation
 	Destination, PageTitle string
-	ThemeFolder, BlogTitle string
-	Author, BlogURL        string
 	PageNum                int
 	MaxPageNum             int
 }
@@ -37,8 +37,8 @@ type ListingConfig struct {
 var shortTemplatePath string
 
 // Generate starts the listing generation
-func (g *ListingGenerator) Generate() error {
-	shortTemplatePath = g.Config.ThemeFolder + "short.html"
+func (g *ListingGenerator) Generate() (err error) {
+	shortTemplatePath = g.Config.SiteInfo.ThemeFolder + "short.html"
 	posts := g.Config.Posts
 	t := g.Config.Template
 	destination := g.Config.Destination
@@ -73,23 +73,21 @@ func (g *ListingGenerator) Generate() error {
 			return fmt.Errorf("error creating directory at %s: %v", destination, err)
 		}
 	}
-	err = writeIndexHTMLPlus(destination, pageTitle, g.Config.Author, g.Config.BlogURL, g.Config.BlogTitle, htmlBlocks,
-		t, false, g.Config.PageNum, g.Config.MaxPageNum)
+	err = writeIndexHTMLPlus(destination, pageTitle, htmlBlocks, t, g.Config.SiteInfo, false, g.Config.PageNum, g.Config.MaxPageNum)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func createTags(tags []string) []*Tag {
-	var result []*Tag
+func createTags(tags []string) (result []Tag) {
 	for _, tag := range tags {
-		result = append(result, &Tag{Name: tag, Link: getTagLink(tag)})
+		result = append(result, Tag{Name: tag, Link: getTagLink(tag)})
 	}
 	return result
 }
 
-func calculateTimeToRead(input string) string {
+func calculateTimeToRead(input string) (time string) {
 	// an average human reads about 200 wpm
 	var secondsPerWord = 60.0 / 200.0
 	// multiply with the amount of words
@@ -100,5 +98,6 @@ func calculateTimeToRead(input string) string {
 	if result < 1.0 {
 		result = 1.0
 	}
-	return fmt.Sprintf("%.0fm", result)
+	time = fmt.Sprintf("%.0fm", result)
+	return time
 }

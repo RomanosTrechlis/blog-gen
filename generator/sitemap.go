@@ -21,7 +21,7 @@ type SitemapConfig struct {
 }
 
 // Generate creates the sitemap
-func (g *SitemapGenerator) Generate() error {
+func (g *SitemapGenerator) Generate() (err error) {
 	fmt.Println("\tGenerating Sitemap...")
 	posts := g.Config.Posts
 	tagPostsMap := g.Config.TagPostsMap

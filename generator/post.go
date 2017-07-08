@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/RomanosTrechlis/blog-generator/util/fs"
+	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
 // Post holds data for a post
@@ -36,21 +37,20 @@ type PostGenerator struct {
 // PostConfig holds the post's configuration
 type PostConfig struct {
 	Post                    *Post
-	Destination, DateFormat string
-	TempFolder 						  string
-	ThemeFolder, BlogTitle  string
-	Author, BlogURL         string
+	SiteInfo							  *config.SiteInformation
 	Template                *template.Template
+	Destination						  string
 }
 
 // Generate generates a post
-func (g *PostGenerator) Generate() error {
+func (g *PostGenerator) Generate() (err error) {
 	post := g.Config.Post
+	siteInfo := g.Config.SiteInfo
 	destination := g.Config.Destination
 	t := g.Config.Template
 	fmt.Printf("\tGenerating Post: %s...\n", post.Meta.Title)
 	staticPath := fmt.Sprintf("%s%s", destination, post.Name)
-	err := os.Mkdir(staticPath, os.ModePerm)
+	err = os.Mkdir(staticPath, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("error creating directory at %s: %v", staticPath, err)
 	}
@@ -61,13 +61,12 @@ func (g *PostGenerator) Generate() error {
 		}
 	}
 
-	err = writeIndexHTMLPost(staticPath, post.Meta.Title, g.Config.Author, g.Config.BlogURL, g.Config.BlogURL,
-		template.HTML(string(post.HTML)), t, true)
+	err = writeIndexHTMLPost(staticPath, post.Meta.Title, template.HTML(string(post.HTML)), t, siteInfo, true)
 	if err != nil {
 		return err
 	}
 
-	err = copyAdditionalArtifacts(staticPath, post.Name, g.Config.TempFolder)
+	err = copyAdditionalArtifacts(staticPath, post.Name, siteInfo.TempFolder)
 	if err != nil {
 		return err
 	}
@@ -75,7 +74,7 @@ func (g *PostGenerator) Generate() error {
 	return nil
 }
 
-func newPost(path, dateFormat string) (*Post, error) {
+func newPost(path, dateFormat string) (post *Post, err error) {
 	meta, err := getMeta(path, dateFormat)
 	if err != nil {
 		return nil, err
@@ -89,8 +88,8 @@ func newPost(path, dateFormat string) (*Post, error) {
 		return nil, err
 	}
 	name := path[strings.LastIndex(path, "/"):]
-
-	return &Post{Name: name, Meta: meta, HTML: html, ImagesDir: imagesDir, Images: images}, nil
+	post = &Post{Name: name, Meta: meta, HTML: html, ImagesDir: imagesDir, Images: images}
+	return post, nil
 }
 
 func copyDir(source, path string) (err error) {
@@ -130,7 +129,7 @@ func copyImagesDir(source, destination string) (err error) {
 	return nil
 }
 
-func getMeta(path, dateFormat string) (*Meta, error) {
+func getMeta(path, dateFormat string) (metaP *Meta, err error) {
 	filePath := fmt.Sprintf("%s/meta.yml", path)
 	metaraw, err := ioutil.ReadFile(filePath)
 	if err != nil {
@@ -149,23 +148,24 @@ func getMeta(path, dateFormat string) (*Meta, error) {
 	return &meta, nil
 }
 
-func getHTML(path string) ([]byte, error) {
+func getHTML(path string) (html []byte, err error) {
 	filePath := fmt.Sprintf("%s/post.md", path)
 	input, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("error while reading file %s: %v", filePath, err)
 	}
-	html := blackfriday.MarkdownCommon(input)
+	html = blackfriday.MarkdownCommon(input)
 	replaced, err := replaceCodeParts(html)
 	if err != nil {
 		return nil, fmt.Errorf("error during syntax highlighting of %s: %v", filePath, err)
 	}
-	return []byte(replaced), nil
+	html = []byte(replaced)
+	return html, nil
 
 }
 
-func getImages(path string) (string, []string, error) {
-	dirPath := fmt.Sprintf("%s/images", path)
+func getImages(path string) (dirPath string, images []string, err error) {
+	dirPath = fmt.Sprintf("%s/images", path)
 	files, err := ioutil.ReadDir(dirPath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -173,14 +173,14 @@ func getImages(path string) (string, []string, error) {
 		}
 		return "", nil, fmt.Errorf("error while reading folder %s: %v", dirPath, err)
 	}
-	images := []string{}
+	images = []string{}
 	for _, file := range files {
 		images = append(images, file.Name())
 	}
 	return dirPath, images, nil
 }
 
-func replaceCodeParts(htmlFile []byte) (string, error) {
+func replaceCodeParts(htmlFile []byte) (new string, err error) {
 	byteReader := bytes.NewReader(htmlFile)
 	doc, err := goquery.NewDocumentFromReader(byteReader)
 	if err != nil {
@@ -192,7 +192,7 @@ func replaceCodeParts(htmlFile []byte) (string, error) {
 		formatted, _ := syntaxhighlight.AsHTML([]byte(oldCode))
 		s.SetHtml(string(formatted))
 	})
-	new, err := doc.Html()
+	new, err = doc.Html()
 	if err != nil {
 		return "", fmt.Errorf("error while generating html: %v", err)
 	}

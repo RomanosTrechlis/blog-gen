@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-func clearAndCreateDestination(path string) error {
-	err := os.RemoveAll(path)
+func clearAndCreateDestination(path string) (err error) {
+	err = os.RemoveAll(path)
 	if err != nil {
 		if !os.IsNotExist(err) {
 			return fmt.Errorf("error removing folder at destination %s: %v ", path, err)
@@ -17,15 +17,15 @@ func clearAndCreateDestination(path string) error {
 	return os.Mkdir(path, os.ModePerm)
 }
 
-func getTemplate(path string) (*template.Template, error) {
-	t, err := template.ParseFiles(path)
+func getTemplate(path string) (t *template.Template, err error) {
+	t, err = template.ParseFiles(path)
 	if err != nil {
 		return nil, fmt.Errorf("error reading template %s: %v", path, err)
 	}
 	return t, nil
 }
 
-func buildCanonicalLink(path, baseURL string) string {
+func buildCanonicalLink(path, baseURL string) (link string) {
 	parts := strings.Split(path, "/")
 	if len(parts) > 2 {
 		return fmt.Sprintf("%s/%s/index.html", baseURL, strings.Join(parts[2:], "/"))
@@ -33,10 +33,11 @@ func buildCanonicalLink(path, baseURL string) string {
 	return "/"
 }
 
-func getTagLink(tag string) string {
-	return fmt.Sprintf("/tags/%s/", strings.ToLower(tag))
+func getTagLink(tag string) (link string) {
+	link = fmt.Sprintf("/tags/%s/", strings.ToLower(tag))
+	return link
 }
 
-func getFolder(path string) string {
+func getFolder(path string) (folder string) {
 	return path[:strings.LastIndex(path, "/")]
 }

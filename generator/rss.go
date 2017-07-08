@@ -5,6 +5,7 @@ import (
 	"github.com/beevik/etree"
 	"os"
 	"time"
+	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
 // RSSGenerator object
@@ -16,17 +17,13 @@ type RSSGenerator struct {
 type RSSConfig struct {
 	Posts           []*Post
 	Destination     string
-	BlogTitle       string
-	BlogURL         string
-	BlogLanguage    string
-	BlogDescription string
-	DateFormat      string
+	SiteInfo				*config.SiteInformation
 }
 
 const rssDateFormat string = "02 Jan 2006 15:04 -0700"
 
 // Generate creates an RSS feed
-func (g *RSSGenerator) Generate() error {
+func (g *RSSGenerator) Generate() (err error) {
 	fmt.Println("\tGenerating RSS...")
 	posts := g.Config.Posts
 	destination := g.Config.Destination
@@ -36,20 +33,21 @@ func (g *RSSGenerator) Generate() error {
 	rss.CreateAttr("xmlns:atom", "http://www.w3.org/2005/Atom")
 	rss.CreateAttr("version", "2.0")
 	channel := rss.CreateElement("channel")
+	siteInfo := g.Config.SiteInfo
 
-	channel.CreateElement("title").SetText(g.Config.BlogTitle)
-	channel.CreateElement("link").SetText(g.Config.BlogURL)
-	channel.CreateElement("language").SetText(g.Config.BlogLanguage)
-	channel.CreateElement("description").SetText(g.Config.BlogDescription)
+	channel.CreateElement("title").SetText(siteInfo.BlogTitle)
+	channel.CreateElement("link").SetText(siteInfo.BlogURL)
+	channel.CreateElement("language").SetText(siteInfo.BlogLanguage)
+	channel.CreateElement("description").SetText(siteInfo.BlogDescription)
 	channel.CreateElement("lastBuildDate").SetText(time.Now().Format(rssDateFormat))
 
 	atomLink := channel.CreateElement("atom:link")
-	atomLink.CreateAttr("href", fmt.Sprintf("%s/index.xml", g.Config.BlogURL))
+	atomLink.CreateAttr("href", fmt.Sprintf("%s/index.xml", siteInfo.BlogURL))
 	atomLink.CreateAttr("rel", "self")
 	atomLink.CreateAttr("type", "application/rss+xml")
 
 	for _, post := range posts {
-		err := addItem(channel, post, fmt.Sprintf("%s/%s/", g.Config.BlogURL, post.Name[1:]), g.Config.DateFormat)
+		err := addItem(channel, post, fmt.Sprintf("%s/%s/", siteInfo.BlogURL, post.Name[1:]), siteInfo.DateFormat)
 		if err != nil {
 			return err
 		}
@@ -69,7 +67,7 @@ func (g *RSSGenerator) Generate() error {
 	return nil
 }
 
-func addItem(element *etree.Element, post *Post, path, dateFormat string) error {
+func addItem(element *etree.Element, post *Post, path, dateFormat string) (err error) {
 	meta := post.Meta
 	item := element.CreateElement("item")
 	item.CreateElement("title").SetText(meta.Title)

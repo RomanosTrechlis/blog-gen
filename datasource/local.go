@@ -10,14 +10,14 @@ import (
 type LocalDataSource struct{}
 
 // NewLocalDataSource creates a new LocalDataSource
-func NewLocalDataSource() DataSource {
+func NewLocalDataSource() (ds DataSource) {
 	return &LocalDataSource{}
 }
 
 // Fetch creates the output folder, clears it and copies the local folder there
-func (ds *LocalDataSource) Fetch(from, to string) ([]string, error) {
+func (ds *LocalDataSource) Fetch(from, to string) (dirs []string, err error) {
 	fmt.Printf("Fetching data from %s into %s...\n", from, to)
-	err := fs.CreateFolderIfNotExist(to)
+	err = fs.CreateFolderIfNotExist(to)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (ds *LocalDataSource) Fetch(from, to string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	dirs, err := fs.GetContentFolders(to)
+	dirs, err = fs.GetContentFolders(to)
 	if err != nil {
 		return nil, err
 	}
