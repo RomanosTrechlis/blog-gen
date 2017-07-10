@@ -70,6 +70,7 @@ func (c *Config) Run() (exitCode int) {
 		&runCmd {
 			source: siteInfo.DestFolder,
 		},
+		&jsonExampleCmd {},
 	}
 
 	outLogger := log.New(c.Stdout, "", 0)

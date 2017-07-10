@@ -9,6 +9,17 @@ const downloadPostsShortHelp = `Downloads posts from given datasource`
 const downloadPostsLongHelp = `
 Downloads posts from a given datasource inside the config.json file.
 
+The folowing part of config.json controls the behavior of "fetch-posts"
+command.
+
+"DataSource": {
+    "Type": "git",
+    "Repository": "https://github.com/RomanosTrechlis/blog.git"
+},
+"TempFolder": "./tmp"
+
+The "Type" can also be "local" and the "Repository" local folder.
+The "TempFolder" is were the posts will be cloned for generation.
 `
 
 type downloadPostCmd struct {

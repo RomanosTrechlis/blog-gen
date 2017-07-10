@@ -8,7 +8,18 @@ import (
 const downloadThemeShortHelp = `Downloads theme from given datasource`
 const downloadThemeLongHelp = `
 Downloads theme from a given datasource inside the config.json file.
+The folowing part of config.json controls the behavior of "fetch-posts"
+command.
 
+"ThemeFolder": "./static/",
+"Theme": {
+    "Type": "git",
+    "Repository": "https://github.com/RomanosTrechlis/BlogThemeBlueSimple.git"
+},
+
+The "Type" can also be "local" and the "Repository" a local folder.
+The "ThemeFolder" is were the static pages of the theme will be
+cloned for use in the blog generation phase.
 `
 
 type downloadThemeCmd struct {
