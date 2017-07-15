@@ -15,39 +15,17 @@ func ReadConfig(configFile string) (siteInfo *config.SiteInformation) {
 	return &config.SiteInfo
 }
 
-// DownloadPosts fetches content from the data source
-func DownloadPosts(siteInfo *config.SiteInformation) {
+// Download fetches content from the data source
+func Download(dsType, dsRepository, tempFolder string) {
 	// handle blog posts repository
 	var err error
-	switch siteInfo.DataSource.Type {
+	switch dsType {
 	case "git":
 		ds := datasource.NewGitDataSource()
-		_, err = ds.Fetch(siteInfo.DataSource.Repository,
-			siteInfo.TempFolder)
+		_, err = ds.Fetch(dsRepository, tempFolder)
 	case "local":
 		ds := datasource.NewLocalDataSource()
-		_, err = ds.Fetch(siteInfo.DataSource.Repository,
-			siteInfo.TempFolder)
-	case "":
-		log.Fatal("please provide a datasource in the configuration file")
-	}
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func DownloadTheme(siteInfo *config.SiteInformation) {
-	var err error
-	// handle theme repository
-	switch siteInfo.Theme.Type {
-	case "git":
-		ds := datasource.NewGitDataSource()
-		_, err = ds.Fetch(siteInfo.Theme.Repository,
-			siteInfo.ThemeFolder)
-	case "local":
-		ds := datasource.NewLocalDataSource()
-		_, err = ds.Fetch(siteInfo.Theme.Repository,
-			siteInfo.ThemeFolder)
+		_, err = ds.Fetch(dsRepository, tempFolder)
 	case "":
 		log.Fatal("please provide a datasource in the configuration file")
 	}

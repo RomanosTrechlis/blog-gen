@@ -1,4 +1,4 @@
-package blog_generator
+package main
 
 import (
 	"flag"
@@ -29,8 +29,8 @@ func main() {
 	siteInfo := cli.ReadConfig(config.ConfigFile)
 
 	if download {
-		cli.DownloadPosts(siteInfo)
-		cli.DownloadTheme(siteInfo)
+		cli.Download(siteInfo.DataSource.Type, siteInfo.DataSource.Repository, siteInfo.TempFolder)
+		cli.Download(siteInfo.Theme.Type, siteInfo.Theme.Repository, siteInfo.ThemeFolder)
 	}
 
 	if generate {
