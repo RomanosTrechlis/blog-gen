@@ -15,8 +15,8 @@ func ReadConfig(configFile string) (siteInfo *config.SiteInformation) {
 	return &config.SiteInfo
 }
 
-// Download fetches content from the data source
-func Download(siteInfo *config.SiteInformation) {
+// DownloadPosts fetches content from the data source
+func DownloadPosts(siteInfo *config.SiteInformation) {
 	// handle blog posts repository
 	var err error
 	switch siteInfo.DataSource.Type {
@@ -34,7 +34,10 @@ func Download(siteInfo *config.SiteInformation) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
 
+func DownloadTheme(siteInfo *config.SiteInformation) {
+	var err error
 	// handle theme repository
 	switch siteInfo.Theme.Type {
 	case "git":

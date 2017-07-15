@@ -29,7 +29,8 @@ func main() {
 	siteInfo := cli.ReadConfig(config.ConfigFile)
 
 	if download {
-		cli.Download(siteInfo)
+		cli.DownloadPosts(siteInfo)
+		cli.DownloadTheme(siteInfo)
 	}
 
 	if generate {
