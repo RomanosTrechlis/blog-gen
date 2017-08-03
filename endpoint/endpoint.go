@@ -1,9 +1,11 @@
 package endpoint
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Endpoint interface {
-	Upload(to string) error
+	Upload(destFolder, endpointUsername, endpointPassword, endpointURL string) error
 }
 
 func New(endpointType string) (endpoint Endpoint, err error) {

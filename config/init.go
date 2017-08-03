@@ -6,12 +6,6 @@ import (
 	"log"
 )
 
-// ConfigFile contains information about the site
-var ConfigFile string
-
-// SiteInfo contains all the variables for the site
-var SiteInfo SiteInformation
-
 type BlogInformation interface {
 }
 
@@ -61,7 +55,7 @@ func NewSiteInformation(configFile string) (siteInfo SiteInformation) {
 	if err != nil {
 		log.Fatal("error accessing directory %s: %v", configFile, err)
 	}
-	siteInfo.ParseJSON(data)
+	(&siteInfo).ParseJSON(data)
 	return fillDefaultValues(siteInfo)
 }
 

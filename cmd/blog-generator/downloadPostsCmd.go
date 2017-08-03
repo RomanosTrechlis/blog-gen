@@ -38,14 +38,13 @@ func (cmd *downloadPostCmd) Register(fs *flag.FlagSet) {
 func (cmd *downloadPostCmd) Run(ctx *Ctx, args []string) error {
 	ds, err := datasource.New(cmd.sourceType)
 	if err != nil {
-		ctx.Err.Fatal("please provide a datasource in the configuration file")
+		ctx.Err.Fatal("please provide a datasource in the configuration file:", err)
+		return err
 	}
 
-	_, err = ds.Fetch(cmd.source,
-		cmd.destination)
+	_, err = ds.Fetch(cmd.source, cmd.destination)
 	if err != nil {
-		ctx.Err.Fatal("failure to fetch posts")
+		ctx.Err.Fatal("failure to fetch posts:", err)
 	}
-
 	return err
 }

@@ -65,7 +65,7 @@ func (c *Config) Run() (exitCode int) {
 			destination: siteInfo.ThemeFolder,
 		},
 		&generateCmd{
-			siteInfo: siteInfo,
+			siteInfo: &siteInfo,
 		},
 		&runCmd{
 			source: siteInfo.DestFolder,

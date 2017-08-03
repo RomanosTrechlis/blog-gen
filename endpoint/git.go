@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/RomanosTrechlis/blog-generator/config"
 	"github.com/RomanosTrechlis/blog-generator/util/fs"
 	"strings"
 )
@@ -19,10 +18,9 @@ func newGitEndpoint() (e Endpoint) {
 
 // Upload uploads the site to a git repository
 // todo: push fails
-func (ds *gitEndpoint) Upload(to string) (err error) {
+func (ds *gitEndpoint) Upload(destFolder, endpointUsername, endpointPassword, endpointURL string) (err error) {
 	fmt.Println("Uploading Site...")
-	path := config.SiteInfo.DestFolder
-	dest := config.SiteInfo.DestFolder + "_upload"
+	dest := destFolder + "_upload"
 	err = fs.CreateFolderIfNotExist(dest)
 	if err != nil {
 		return err
@@ -38,10 +36,10 @@ func (ds *gitEndpoint) Upload(to string) (err error) {
 	cmd.Dir = dest
 	err = cmd.Run()
 	if err != nil {
-		return fmt.Errorf("error initializing git repository at %s: %v", path, err)
+		return fmt.Errorf("error initializing git repository at %s: %v", destFolder, err)
 	}
 
-	url, err := createUrlWithCred(to)
+	url, err := createUrlWithCred(endpointUsername, endpointPassword, endpointURL)
 	if err != nil {
 		return fmt.Errorf("%v", err)
 	}
@@ -53,10 +51,10 @@ func (ds *gitEndpoint) Upload(to string) (err error) {
 	if err != nil {
 		return fmt.Errorf("error creating upload folder %s: %v", dest, err)
 	}
-	err = fs.CopyDir(config.SiteInfo.DestFolder, dest)
+	err = fs.CopyDir(destFolder, dest)
 	if err != nil {
 		return fmt.Errorf("error copying generated folder %s to upload folder %s: %v",
-			config.SiteInfo.DestFolder, dest, err)
+			destFolder, dest, err)
 	}
 
 	addArgs := []string{"add", "."}
@@ -80,17 +78,17 @@ func (ds *gitEndpoint) Upload(to string) (err error) {
 	cmd.Dir = dest
 	err = cmd.Run()
 	if err != nil {
-		return fmt.Errorf("error pushing to remote %s: %v", to, err)
+		return fmt.Errorf("error pushing to remote %s: %v", endpointURL, err)
 	}
 	fmt.Println("Upload Complete.")
 	return nil
 }
 
-func createUrlWithCred(to string) (url string, err error) {
+func createUrlWithCred(username, password, to string) (url string, err error) {
 	t := strings.Split(to, "://")
 	if len(t) != 2 {
 		return "", fmt.Errorf("couldn't process git url")
 	}
-	p := strings.Replace(config.SiteInfo.Upload.Password, "@", "%40", 5)
-	return t[0] + "://" + config.SiteInfo.Upload.Username + ":" + p + "@" + t[1], nil
+	p := strings.Replace(password, "@", "%40", 5)
+	return t[0] + "://" + username + ":" + p + "@" + t[1], nil
 }

@@ -56,6 +56,7 @@ const jsonExampleLongHelp = `
     }
   ],
   "Upload": {
+  	"Type": "git",
     "URL": "https://github.com/RomanosTrechlis/romanostrechlis.github.io.git",
     "Username": "RomanosTrechlis",
     "Password": ""

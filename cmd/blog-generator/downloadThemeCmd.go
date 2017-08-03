@@ -38,14 +38,13 @@ func (cmd *downloadThemeCmd) Register(fs *flag.FlagSet) {
 func (cmd *downloadThemeCmd) Run(ctx *Ctx, args []string) error {
 	ds, err := datasource.New(cmd.sourceType)
 	if err != nil {
-		ctx.Err.Fatal("please provide a datasource in the configuration file")
+		ctx.Err.Fatal("please provide a datasource in the configuration file:", err)
+		return err
 	}
 
-	_, err = ds.Fetch(cmd.source,
-		cmd.destination)
+	_, err = ds.Fetch(cmd.source, cmd.destination)
 	if err != nil {
-		ctx.Err.Fatal("failure to fetch theme")
+		ctx.Err.Fatal("failure to fetch theme:", err)
 	}
-
 	return err
 }

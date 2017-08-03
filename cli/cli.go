@@ -10,9 +10,8 @@ import (
 )
 
 // ReadConfig creates object holding site information
-func ReadConfig(configFile string) (siteInfo *config.SiteInformation) {
-	config.SiteInfo = config.NewSiteInformation(configFile)
-	return &config.SiteInfo
+func ReadConfig(configFile string) (siteInfo config.SiteInformation) {
+	return config.NewSiteInformation(configFile)
 }
 
 // Download fetches content from the data source
@@ -52,7 +51,7 @@ func Upload(siteInfo *config.SiteInformation) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = e.Upload(siteInfo.Upload.URL)
+	err = e.Upload(siteInfo.DestFolder, siteInfo.Upload.Username, siteInfo.Upload.Password, siteInfo.Upload.URL)
 	if err != nil {
 		log.Fatal(err)
 	}
