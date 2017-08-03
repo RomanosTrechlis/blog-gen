@@ -6,16 +6,16 @@ import (
 	"github.com/RomanosTrechlis/blog-generator/util/fs"
 )
 
-// LocalDataSource is the local data source object
-type LocalDataSource struct{}
+// localDataSource is the local data source object
+type localDataSource struct{}
 
-// NewLocalDataSource creates a new LocalDataSource
-func NewLocalDataSource() (ds DataSource) {
-	return &LocalDataSource{}
+// newLocalDataSource creates a new LocalDataSource
+func newLocalDataSource() (ds DataSource) {
+	return &localDataSource{}
 }
 
 // Fetch creates the output folder, clears it and copies the local folder there
-func (ds *LocalDataSource) Fetch(from, to string) (dirs []string, err error) {
+func (ds *localDataSource) Fetch(from, to string) (dirs []string, err error) {
 	fmt.Printf("Fetching data from %s into %s...\n", from, to)
 	err = fs.CreateFolderIfNotExist(to)
 	if err != nil {

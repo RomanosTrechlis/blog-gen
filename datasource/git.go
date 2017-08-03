@@ -7,16 +7,16 @@ import (
 	"github.com/RomanosTrechlis/blog-generator/util/fs"
 )
 
-// GitDataSource is the git data source object
-type GitDataSource struct{}
+// gitDataSource is the git data source object
+type gitDataSource struct{}
 
-// NewGitDataSource creates a new GitDataSource
-func NewGitDataSource() (ds DataSource) {
-	return &GitDataSource{}
+// newGitDataSource creates a new GitDataSource
+func newGitDataSource() (ds DataSource) {
+	return &gitDataSource{}
 }
 
 // Fetch creates the output folder, clears it and clones the repository there
-func (ds *GitDataSource) Fetch(from, to string) (dirs []string, err error) {
+func (ds *gitDataSource) Fetch(from, to string) (dirs []string, err error) {
 	fmt.Printf("Fetching data from %s into %s...\n", from, to)
 	err = fs.CreateFolderIfNotExist(to)
 	if err != nil {

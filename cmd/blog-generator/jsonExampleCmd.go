@@ -63,7 +63,6 @@ const jsonExampleLongHelp = `
 }
 `
 
-
 type jsonExampleCmd struct {
 }
 

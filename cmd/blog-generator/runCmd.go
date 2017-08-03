@@ -2,8 +2,8 @@ package main
 
 import (
 	"flag"
-	"strconv"
 	"net/http"
+	"strconv"
 )
 
 const runShortHelp = `Runs a web server for the generated blog`
@@ -16,7 +16,7 @@ The default port for the server is 8080.
 
 type runCmd struct {
 	source string
-	port int
+	port   int
 }
 
 func (cmd *runCmd) Name() string      { return "run" }

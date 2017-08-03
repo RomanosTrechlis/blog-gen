@@ -82,7 +82,7 @@ func runTasks(posts []*Post, t *template.Template, siteInfo *config.SiteInformat
 			Post:        post,
 			Destination: destination,
 			Template:    t,
-			SiteInfo: 	 siteInfo,
+			SiteInfo:    siteInfo,
 		}}
 		generators = append(generators, &pg)
 	}
@@ -144,9 +144,9 @@ func runTasks(posts []*Post, t *template.Template, siteInfo *config.SiteInformat
 	}}
 	// rss
 	rg := RSSGenerator{&RSSConfig{
-		Posts:           posts,
-		Destination:     destination,
-		SiteInfo:    		 siteInfo,
+		Posts:       posts,
+		Destination: destination,
+		SiteInfo:    siteInfo,
 	}}
 	// statics
 	fileToDestination := make(map[string]string)
@@ -162,7 +162,7 @@ func runTasks(posts []*Post, t *template.Template, siteInfo *config.SiteInformat
 		FileToDestination: fileToDestination,
 		TemplateToFile:    templateToFile,
 		Template:          t,
-		SiteInfo:					 siteInfo,
+		SiteInfo:          siteInfo,
 	}}
 	generators = append(generators, &ag, &tg, &ct, &sg, &rg, &statg)
 
@@ -201,12 +201,12 @@ func writeIndexHTML(path, pageTitle string, content template.HTML, t *template.T
 }
 
 func writeIndexHTMLPost(path, pageTitle string, content template.HTML, t *template.Template, siteInfo *config.SiteInformation,
-		isPost bool) (err error) {
+	isPost bool) (err error) {
 	return writeIndexHTMLPlus(path, pageTitle, content, t, siteInfo, isPost, 0, 0)
 }
 
 func writeIndexHTMLPlus(path, pageTitle string, content template.HTML, t *template.Template, siteInfo *config.SiteInformation,
-		isPost bool, page, maxPage int) (err error) {
+	isPost bool, page, maxPage int) (err error) {
 	filePath := fmt.Sprintf("%s/index.html", path)
 	f, err := os.Create(filePath)
 	if err != nil {

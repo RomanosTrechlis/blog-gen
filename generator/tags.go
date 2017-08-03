@@ -26,9 +26,9 @@ type TagsGenerator struct {
 
 // TagsConfig holds the tag's config
 type TagsConfig struct {
-	TagPostsMap     map[string][]*Post
-	Template        *template.Template
-	SiteInfo        *config.SiteInformation
+	TagPostsMap map[string][]*Post
+	Template    *template.Template
+	SiteInfo    *config.SiteInformation
 }
 
 var tagsTemplatePath string

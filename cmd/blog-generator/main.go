@@ -1,15 +1,15 @@
 package main
 
 import (
-	"flag"
-	"log"
-	"io"
-	"os"
-	"fmt"
-	"text/tabwriter"
-	"strings"
 	"bytes"
+	"flag"
+	"fmt"
 	"github.com/RomanosTrechlis/blog-generator/cli"
+	"io"
+	"log"
+	"os"
+	"strings"
+	"text/tabwriter"
 )
 
 type Ctx struct {
@@ -54,23 +54,23 @@ func main() {
 func (c *Config) Run() (exitCode int) {
 	siteInfo := cli.ReadConfig("config.json")
 	commands := []command{
-		&downloadPostCmd {
-			sourceType: siteInfo.DataSource.Type,
-			source: siteInfo.DataSource.Repository,
+		&downloadPostCmd{
+			sourceType:  siteInfo.DataSource.Type,
+			source:      siteInfo.DataSource.Repository,
 			destination: siteInfo.TempFolder,
 		},
-		&downloadThemeCmd {
-			sourceType: siteInfo.Theme.Type,
-			source: siteInfo.Theme.Repository,
+		&downloadThemeCmd{
+			sourceType:  siteInfo.Theme.Type,
+			source:      siteInfo.Theme.Repository,
 			destination: siteInfo.ThemeFolder,
 		},
-		&generateCmd {
+		&generateCmd{
 			siteInfo: siteInfo,
 		},
-		&runCmd {
+		&runCmd{
 			source: siteInfo.DestFolder,
 		},
-		&jsonExampleCmd {},
+		&jsonExampleCmd{},
 	}
 
 	outLogger := log.New(c.Stdout, "", 0)

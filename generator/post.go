@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/RomanosTrechlis/blog-generator/util/fs"
 	"github.com/RomanosTrechlis/blog-generator/config"
+	"github.com/RomanosTrechlis/blog-generator/util/fs"
 )
 
 // Post holds data for a post
@@ -36,10 +36,10 @@ type PostGenerator struct {
 
 // PostConfig holds the post's configuration
 type PostConfig struct {
-	Post                    *Post
-	SiteInfo							  *config.SiteInformation
-	Template                *template.Template
-	Destination						  string
+	Post        *Post
+	SiteInfo    *config.SiteInformation
+	Template    *template.Template
+	Destination string
 }
 
 // Generate generates a post

@@ -16,6 +16,8 @@
 
 *.iml
 
+projectFilesBackup/
+
 www/
 tmp/
 .idea/

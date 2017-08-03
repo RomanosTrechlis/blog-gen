@@ -3,10 +3,10 @@ package generator
 import (
 	"bytes"
 	"fmt"
+	"github.com/RomanosTrechlis/blog-generator/config"
 	"html/template"
 	"sort"
 	"strings"
-	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
 // Category holds the data for a category
@@ -26,10 +26,10 @@ type CategoriesGenerator struct {
 
 // CategoriesConfig holds the category's config
 type CategoriesConfig struct {
-	CatPostsMap     map[string][]*Post
-	Template        *template.Template
-	Destination     string
-	SiteInfo 				*config.SiteInformation
+	CatPostsMap map[string][]*Post
+	Template    *template.Template
+	Destination string
+	SiteInfo    *config.SiteInformation
 }
 
 var catTemplatePath string
@@ -63,7 +63,7 @@ func (g *CategoriesGenerator) Generate() (err error) {
 }
 
 func generateCatIndex(catPostsMap map[string][]*Post, t *template.Template,
-		destination string, siteInfo *config.SiteInformation) (err error) {
+	destination string, siteInfo *config.SiteInformation) (err error) {
 	tmpl, err := getTemplate(catTemplatePath)
 	if err != nil {
 		return err
@@ -86,7 +86,7 @@ func generateCatIndex(catPostsMap map[string][]*Post, t *template.Template,
 }
 
 func generateCatPage(cat string, posts []*Post, t *template.Template,
-		destination string, siteInfo *config.SiteInformation) (err error) {
+	destination string, siteInfo *config.SiteInformation) (err error) {
 	err = clearAndCreateDestination(destination)
 	if err != nil {
 		return err

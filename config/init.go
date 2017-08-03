@@ -50,6 +50,7 @@ type DataSource struct {
 }
 
 type Upload struct {
+	Type     string `json:Type`
 	URL      string `json:URL`
 	Username string `json:Username`
 	Password string `json:Password`

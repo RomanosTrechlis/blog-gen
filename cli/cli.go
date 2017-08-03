@@ -18,17 +18,12 @@ func ReadConfig(configFile string) (siteInfo *config.SiteInformation) {
 // Download fetches content from the data source
 func Download(dsType, dsRepository, tempFolder string) {
 	// handle blog posts repository
-	var err error
-	switch dsType {
-	case "git":
-		ds := datasource.NewGitDataSource()
-		_, err = ds.Fetch(dsRepository, tempFolder)
-	case "local":
-		ds := datasource.NewLocalDataSource()
-		_, err = ds.Fetch(dsRepository, tempFolder)
-	case "":
-		log.Fatal("please provide a datasource in the configuration file")
+	ds, err := datasource.New(dsType)
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	_, err = ds.Fetch(dsRepository, tempFolder)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -53,8 +48,11 @@ func Generate(siteInfo *config.SiteInformation) {
 
 // Upload uploads content to endpoint
 func Upload(siteInfo *config.SiteInformation) {
-	e := endpoint.NewGitEndpoint()
-	err := e.Upload(siteInfo.Upload.URL)
+	e, err := endpoint.New(siteInfo.Upload.Type)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = e.Upload(siteInfo.Upload.URL)
 	if err != nil {
 		log.Fatal(err)
 	}

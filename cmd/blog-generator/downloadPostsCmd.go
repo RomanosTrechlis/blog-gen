@@ -36,18 +36,15 @@ func (cmd *downloadPostCmd) Register(fs *flag.FlagSet) {
 }
 
 func (cmd *downloadPostCmd) Run(ctx *Ctx, args []string) error {
-	var err error
-	switch cmd.sourceType {
-	case "git":
-		ds := datasource.NewGitDataSource()
-		_, err = ds.Fetch(cmd.source,
-			cmd.destination)
-	case "local":
-		ds := datasource.NewLocalDataSource()
-		_, err = ds.Fetch(cmd.source,
-			cmd.destination)
-	case "":
+	ds, err := datasource.New(cmd.sourceType)
+	if err != nil {
 		ctx.Err.Fatal("please provide a datasource in the configuration file")
+	}
+
+	_, err = ds.Fetch(cmd.source,
+		cmd.destination)
+	if err != nil {
+		ctx.Err.Fatal("failure to fetch posts")
 	}
 
 	return err

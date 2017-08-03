@@ -2,10 +2,10 @@ package generator
 
 import (
 	"fmt"
+	"github.com/RomanosTrechlis/blog-generator/config"
 	"github.com/beevik/etree"
 	"os"
 	"time"
-	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
 // RSSGenerator object
@@ -15,9 +15,9 @@ type RSSGenerator struct {
 
 // RSSConfig holds the configuration for an RSS feed
 type RSSConfig struct {
-	Posts           []*Post
-	Destination     string
-	SiteInfo				*config.SiteInformation
+	Posts       []*Post
+	Destination string
+	SiteInfo    *config.SiteInformation
 }
 
 const rssDateFormat string = "02 Jan 2006 15:04 -0700"

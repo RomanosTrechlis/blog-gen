@@ -2,12 +2,12 @@ package generator
 
 import (
 	"fmt"
+	"github.com/RomanosTrechlis/blog-generator/config"
 	"github.com/RomanosTrechlis/blog-generator/util/fs"
 	"html/template"
 	"io/ioutil"
 	"os"
 	"strings"
-	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
 // StaticsGenerator object
@@ -20,7 +20,7 @@ type StaticsConfig struct {
 	FileToDestination map[string]string
 	TemplateToFile    map[string]string
 	Template          *template.Template
-	SiteInfo					*config.SiteInformation
+	SiteInfo          *config.SiteInformation
 }
 
 // Generate creates the static pages

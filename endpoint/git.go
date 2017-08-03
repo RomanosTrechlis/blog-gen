@@ -9,17 +9,17 @@ import (
 	"strings"
 )
 
-// GitEndpoint is the git endpoint object
-type GitEndpoint struct{}
+// gitEndpoint is the git endpoint object
+type gitEndpoint struct{}
 
-// NewGitEndpoint creates a new GitEndpoint
-func NewGitEndpoint() (e Endpoint) {
-	return &GitEndpoint{}
+// newGitEndpoint creates a new GitEndpoint
+func newGitEndpoint() (e Endpoint) {
+	return &gitEndpoint{}
 }
 
 // Upload uploads the site to a git repository
 // todo: push fails
-func (ds *GitEndpoint) Upload(to string) (err error) {
+func (ds *gitEndpoint) Upload(to string) (err error) {
 	fmt.Println("Uploading Site...")
 	path := config.SiteInfo.DestFolder
 	dest := config.SiteInfo.DestFolder + "_upload"

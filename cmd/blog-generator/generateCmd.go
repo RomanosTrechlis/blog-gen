@@ -2,9 +2,9 @@ package main
 
 import (
 	"flag"
-	"github.com/RomanosTrechlis/blog-generator/util/fs"
-	"github.com/RomanosTrechlis/blog-generator/generator"
 	"github.com/RomanosTrechlis/blog-generator/config"
+	"github.com/RomanosTrechlis/blog-generator/generator"
+	"github.com/RomanosTrechlis/blog-generator/util/fs"
 )
 
 const generateShortHelp = `Generates blog from existing resources`
