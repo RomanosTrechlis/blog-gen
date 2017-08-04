@@ -2,8 +2,9 @@ package generator
 
 import (
 	"fmt"
-	"github.com/beevik/etree"
 	"os"
+
+	"github.com/beevik/etree"
 )
 
 // SitemapGenerator object

@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/RomanosTrechlis/blog-generator/util/fs"
 	"strings"
+
+	"github.com/RomanosTrechlis/blog-generator/util/fs"
 )
 
 // gitEndpoint is the git endpoint object

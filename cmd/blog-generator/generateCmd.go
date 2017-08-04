@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+
 	"github.com/RomanosTrechlis/blog-generator/config"
 	"github.com/RomanosTrechlis/blog-generator/generator"
 	"github.com/RomanosTrechlis/blog-generator/util/fs"

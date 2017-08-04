@@ -3,10 +3,11 @@ package generator
 import (
 	"bytes"
 	"fmt"
-	"github.com/RomanosTrechlis/blog-generator/config"
 	"html/template"
 	"sort"
 	"strings"
+
+	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
 // Category holds the data for a category

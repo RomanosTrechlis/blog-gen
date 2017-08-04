@@ -2,18 +2,19 @@ package main
 
 import (
 	"flag"
-	"github.com/RomanosTrechlis/blog-generator/cli"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/RomanosTrechlis/blog-generator/cli"
 )
 
 var (
-	generate bool
-	server bool
-	download bool
-	upload bool
-	port int
+	generate   bool
+	server     bool
+	download   bool
+	upload     bool
+	port       int
 	configFile string
 )
 

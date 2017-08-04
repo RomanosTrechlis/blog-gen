@@ -2,12 +2,13 @@ package generator
 
 import (
 	"fmt"
-	"github.com/RomanosTrechlis/blog-generator/config"
-	"github.com/RomanosTrechlis/blog-generator/util/fs"
 	"html/template"
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/RomanosTrechlis/blog-generator/config"
+	"github.com/RomanosTrechlis/blog-generator/util/fs"
 )
 
 // StaticsGenerator object

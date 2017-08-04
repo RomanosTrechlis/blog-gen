@@ -1,12 +1,13 @@
 package cli
 
 import (
+	"log"
+
 	"github.com/RomanosTrechlis/blog-generator/config"
 	"github.com/RomanosTrechlis/blog-generator/datasource"
 	"github.com/RomanosTrechlis/blog-generator/endpoint"
 	"github.com/RomanosTrechlis/blog-generator/generator"
 	"github.com/RomanosTrechlis/blog-generator/util/fs"
-	"log"
 )
 
 // ReadConfig creates object holding site information

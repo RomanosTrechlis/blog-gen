@@ -3,15 +3,16 @@ package generator
 import (
 	"bytes"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/russross/blackfriday"
-	"github.com/sourcegraph/syntaxhighlight"
-	"gopkg.in/yaml.v2"
 	"html/template"
 	"io/ioutil"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/russross/blackfriday"
+	"github.com/sourcegraph/syntaxhighlight"
+	"gopkg.in/yaml.v2"
 
 	"github.com/RomanosTrechlis/blog-generator/config"
 	"github.com/RomanosTrechlis/blog-generator/util/fs"

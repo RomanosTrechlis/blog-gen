@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"github.com/RomanosTrechlis/blog-generator/cli"
 	"io"
 	"log"
 	"os"
 	"strings"
 	"text/tabwriter"
+
+	"github.com/RomanosTrechlis/blog-generator/cli"
 )
 
 type Ctx struct {

@@ -2,10 +2,11 @@ package generator
 
 import (
 	"fmt"
-	"github.com/RomanosTrechlis/blog-generator/config"
-	"github.com/beevik/etree"
 	"os"
 	"time"
+
+	"github.com/RomanosTrechlis/blog-generator/config"
+	"github.com/beevik/etree"
 )
 
 // RSSGenerator object

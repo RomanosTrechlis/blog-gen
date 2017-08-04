@@ -3,10 +3,11 @@ package generator
 import (
 	"bytes"
 	"fmt"
-	"github.com/RomanosTrechlis/blog-generator/config"
 	"html/template"
 	"os"
 	"strings"
+
+	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
 // ListingData holds the data for the listing page
