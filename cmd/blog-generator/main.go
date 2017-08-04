@@ -72,6 +72,9 @@ func (c *execConfig) Run() (exitCode int) {
 			source: siteInfo.DestFolder,
 		},
 		&jsonExampleCmd{},
+		&execAllCmd{
+			siteInfo: &siteInfo,
+		},
 	}
 
 	outLogger := log.New(c.Stdout, "", 0)
@@ -93,6 +96,10 @@ func (c *execConfig) Run() (exitCode int) {
 		{
 			"blog-generator run",
 			"creates a web server for the blog. The default port is 8080.",
+		},
+		{
+			"blog-generator exec-all",
+			"sequential execution of all the commands",
 		},
 	}
 
