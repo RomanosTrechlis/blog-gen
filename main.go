@@ -28,7 +28,7 @@ func init() {
 
 func main() {
 	flag.Parse()
-	siteInfo := &cli.ReadConfig(configFile)
+	siteInfo := cli.ReadConfig(configFile)
 
 	if download {
 		cli.Download(siteInfo.DataSource.Type, siteInfo.DataSource.Repository, siteInfo.TempFolder)
@@ -36,11 +36,11 @@ func main() {
 	}
 
 	if generate {
-		cli.Generate(siteInfo)
+		cli.Generate(&siteInfo)
 	}
 
 	if upload {
-		cli.Upload(siteInfo)
+		cli.Upload(&siteInfo)
 	}
 
 	if server {
