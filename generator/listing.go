@@ -20,45 +20,45 @@ type ListingData struct {
 	Tags       []Tag
 }
 
-// ListingGenerator Object
-type ListingGenerator struct {
-	Config *ListingConfig
+// listingGenerator Object
+type listingGenerator struct {
+	config *listingConfig
 }
 
-// ListingConfig holds the configuration for the listing page
-type ListingConfig struct {
-	Posts                  []*Post
-	Template               *template.Template
-	SiteInfo               *config.SiteInformation
-	Destination, PageTitle string
-	PageNum                int
-	MaxPageNum             int
+// listingConfig holds the configuration for the listing page
+type listingConfig struct {
+	posts                  []*post
+	template               *template.Template
+	siteInfo               *config.SiteInformation
+	destination, pageTitle string
+	pageNum                int
+	maxPageNum             int
 }
 
 var shortTemplatePath string
 
 // Generate starts the listing generation
-func (g *ListingGenerator) Generate() (err error) {
-	shortTemplatePath = g.Config.SiteInfo.ThemeFolder + "short.html"
-	posts := g.Config.Posts
-	t := g.Config.Template
-	destination := g.Config.Destination
-	pageTitle := g.Config.PageTitle
+func (g *listingGenerator) Generate() (err error) {
+	shortTemplatePath = g.config.siteInfo.ThemeFolder + "short.html"
+	posts := g.config.posts
+	t := g.config.template
+	destination := g.config.destination
+	pageTitle := g.config.pageTitle
 	short, err := getTemplate(shortTemplatePath)
 	if err != nil {
 		return err
 	}
 	var postBlocks []string
 	for _, post := range posts {
-		meta := post.Meta
-		link := fmt.Sprintf("%s/", post.Name)
+		meta := post.meta
+		link := fmt.Sprintf("%s/", post.name)
 		ld := ListingData{
 			Title:      meta.Title,
 			Date:       meta.Date,
 			Short:      meta.Short,
 			Link:       link,
 			Tags:       createTags(meta.Tags),
-			TimeToRead: calculateTimeToRead(string(post.HTML)),
+			TimeToRead: calculateTimeToRead(string(post.html)),
 		}
 		block := bytes.Buffer{}
 		err := short.Execute(&block, ld)
@@ -68,13 +68,13 @@ func (g *ListingGenerator) Generate() (err error) {
 		postBlocks = append(postBlocks, block.String())
 	}
 	htmlBlocks := template.HTML(strings.Join(postBlocks, "<br />"))
-	if g.Config.PageNum > 1 {
+	if g.config.pageNum > 1 {
 		err := os.Mkdir(destination, os.ModePerm)
 		if err != nil {
 			return fmt.Errorf("error creating directory at %s: %v", destination, err)
 		}
 	}
-	err = writeIndexHTMLPlus(destination, pageTitle, htmlBlocks, t, g.Config.SiteInfo, false, g.Config.PageNum, g.Config.MaxPageNum)
+	err = writeIndexHTMLPlus(destination, pageTitle, htmlBlocks, t, g.config.siteInfo, false, g.config.pageNum, g.config.maxPageNum)
 	if err != nil {
 		return err
 	}

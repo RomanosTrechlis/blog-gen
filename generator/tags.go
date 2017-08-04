@@ -16,31 +16,31 @@ type Tag struct {
 	Count int
 }
 
-// ByCountDesc sorts the tags
-type ByCountDesc []*Tag
+// byCountDesc sorts the tags
+type byCountDesc []*Tag
 
-// TagsGenerator object
-type TagsGenerator struct {
-	Config *TagsConfig
+// tagsGenerator object
+type tagsGenerator struct {
+	config *tagsConfig
 }
 
-// TagsConfig holds the tag's config
-type TagsConfig struct {
-	TagPostsMap map[string][]*Post
-	Template    *template.Template
-	SiteInfo    *config.SiteInformation
+// tagsConfig holds the tag's config
+type tagsConfig struct {
+	tagPostsMap map[string][]*post
+	template    *template.Template
+	siteInfo    *config.SiteInformation
 }
 
 var tagsTemplatePath string
 
 // Generate creates the tags page
-func (g *TagsGenerator) Generate() (err error) {
+func (g *tagsGenerator) Generate() (err error) {
 	fmt.Println("\tGenerating Tags...")
-	siteInfo := g.Config.SiteInfo
+	siteInfo := g.config.siteInfo
 
 	tagsTemplatePath = siteInfo.ThemeFolder + "tags.html"
-	tagPostsMap := g.Config.TagPostsMap
-	t := g.Config.Template
+	tagPostsMap := g.config.tagPostsMap
+	t := g.config.template
 	destination := siteInfo.DestFolder
 	tagsPath := fmt.Sprintf("%s/tags", destination)
 	err = clearAndCreateDestination(tagsPath)
@@ -62,7 +62,7 @@ func (g *TagsGenerator) Generate() (err error) {
 	return nil
 }
 
-func generateTagIndex(tagPostsMap map[string][]*Post, t *template.Template, tagsPath string, siteInfo *config.SiteInformation) (err error) {
+func generateTagIndex(tagPostsMap map[string][]*post, t *template.Template, tagsPath string, siteInfo *config.SiteInformation) (err error) {
 	tmpl, err := getTemplate(tagsTemplatePath)
 	if err != nil {
 		return err
@@ -71,7 +71,7 @@ func generateTagIndex(tagPostsMap map[string][]*Post, t *template.Template, tags
 	for tag, posts := range tagPostsMap {
 		tags = append(tags, &Tag{Name: tag, Link: getTagLink(tag), Count: len(posts)})
 	}
-	sort.Sort(ByCountDesc(tags))
+	sort.Sort(byCountDesc(tags))
 	buf := bytes.Buffer{}
 	err = tmpl.Execute(&buf, tags)
 	if err != nil {
@@ -84,17 +84,17 @@ func generateTagIndex(tagPostsMap map[string][]*Post, t *template.Template, tags
 	return nil
 }
 
-func generateTagPage(destination, tag string, posts []*Post, t *template.Template, siteInfo *config.SiteInformation) (err error) {
+func generateTagPage(destination, tag string, posts []*post, t *template.Template, siteInfo *config.SiteInformation) (err error) {
 	err = clearAndCreateDestination(destination)
 	if err != nil {
 		return err
 	}
-	lg := ListingGenerator{&ListingConfig{
-		Posts:       posts,
-		Template:    t,
-		PageTitle:   tag,
-		SiteInfo:    siteInfo,
-		Destination: destination,
+	lg := listingGenerator{&listingConfig{
+		posts:       posts,
+		template:    t,
+		pageTitle:   tag,
+		siteInfo:    siteInfo,
+		destination: destination,
 	}}
 
 	err = lg.Generate()
@@ -104,14 +104,14 @@ func generateTagPage(destination, tag string, posts []*Post, t *template.Templat
 	return nil
 }
 
-func (t ByCountDesc) Len() int {
+func (t byCountDesc) Len() int {
 	return len(t)
 }
 
-func (t ByCountDesc) Swap(i, j int) {
+func (t byCountDesc) Swap(i, j int) {
 	t[i], t[j] = t[j], t[i]
 }
 
-func (t ByCountDesc) Less(i, j int) bool {
+func (t byCountDesc) Less(i, j int) bool {
 	return t[i].Count > t[j].Count
 }

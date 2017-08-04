@@ -15,9 +15,9 @@ import (
 	"github.com/RomanosTrechlis/blog-generator/config"
 )
 
-// SiteGenerator object
-type SiteGenerator struct {
-	Config *SiteConfig
+// siteGenerator object
+type siteGenerator struct {
+	config *SiteConfig
 }
 
 // SiteConfig holds the sources and destination folder
@@ -27,18 +27,18 @@ type SiteConfig struct {
 }
 
 // New creates a new SiteGenerator
-func NewSiteGenerator(config *SiteConfig) *SiteGenerator {
-	return &SiteGenerator{Config: config}
+func NewSiteGenerator(config *SiteConfig) *siteGenerator {
+	return &siteGenerator{config: config}
 }
 
 var templatePath string
 
 // Generate starts the static blog generation
-func (g *SiteGenerator) Generate() (err error) {
-	templatePath = g.Config.SiteInfo.ThemeFolder + "template.html"
+func (g *siteGenerator) Generate() (err error) {
+	templatePath = g.config.SiteInfo.ThemeFolder + "template.html"
 	fmt.Println("Generating Site...")
-	sources := g.Config.Sources
-	destination := g.Config.SiteInfo.DestFolder
+	sources := g.config.Sources
+	destination := g.config.SiteInfo.DestFolder
 	err = clearAndCreateDestination(destination)
 	if err != nil {
 		return err
@@ -51,16 +51,16 @@ func (g *SiteGenerator) Generate() (err error) {
 	if err != nil {
 		return err
 	}
-	var posts []*Post
+	var posts []*post
 	for _, path := range sources {
-		post, err := newPost(path, g.Config.SiteInfo.DateFormat)
+		post, err := newPost(path, g.config.SiteInfo.DateFormat)
 		if err != nil {
 			return err
 		}
 		posts = append(posts, post)
 	}
-	sort.Sort(ByDateDesc(posts))
-	err = runTasks(posts, t, g.Config.SiteInfo)
+	sort.Sort(byDateDesc(posts))
+	err = runTasks(posts, t, g.config.SiteInfo)
 	if err != nil {
 		return err
 	}
@@ -68,7 +68,7 @@ func (g *SiteGenerator) Generate() (err error) {
 	return nil
 }
 
-func runTasks(posts []*Post, t *template.Template, siteInfo *config.SiteInformation) (err error) {
+func runTasks(posts []*post, t *template.Template, siteInfo *config.SiteInformation) (err error) {
 	var wg sync.WaitGroup
 	finished := make(chan bool, 1)
 	errors := make(chan error, 1)
@@ -78,11 +78,11 @@ func runTasks(posts []*Post, t *template.Template, siteInfo *config.SiteInformat
 
 	//posts
 	for _, post := range posts {
-		pg := PostGenerator{&PostConfig{
-			Post:        post,
-			Destination: destination,
-			Template:    t,
-			SiteInfo:    siteInfo,
+		pg := postGenerator{&postConfig{
+			post:        post,
+			destination: destination,
+			template:    t,
+			siteInfo:    siteInfo,
 		}}
 		generators = append(generators, &pg)
 	}
@@ -100,53 +100,53 @@ func runTasks(posts []*Post, t *template.Template, siteInfo *config.SiteInformat
 		if (i + 1) == numOfPages {
 			toP = len(posts)
 		}
-		generators = append(generators, &ListingGenerator{&ListingConfig{
-			Posts:       posts[i*paging : toP],
-			Template:    t,
-			Destination: to,
-			PageTitle:   "",
-			PageNum:     i + 1,
-			MaxPageNum:  numOfPages,
-			SiteInfo:    siteInfo,
+		generators = append(generators, &listingGenerator{&listingConfig{
+			posts:       posts[i*paging : toP],
+			template:    t,
+			destination: to,
+			pageTitle:   "",
+			pageNum:     i + 1,
+			maxPageNum:  numOfPages,
+			siteInfo:    siteInfo,
 		}})
 	}
 
 	// archive
-	ag := ListingGenerator{&ListingConfig{
-		Posts:       posts,
-		Template:    t,
-		Destination: fmt.Sprintf("%s/archive", destination),
-		PageTitle:   "Archive",
-		SiteInfo:    siteInfo,
+	ag := listingGenerator{&listingConfig{
+		posts:       posts,
+		template:    t,
+		destination: fmt.Sprintf("%s/archive", destination),
+		pageTitle:   "Archive",
+		siteInfo:    siteInfo,
 	}}
 	// tags
-	tg := TagsGenerator{&TagsConfig{
-		TagPostsMap: tagPostsMap,
-		Template:    t,
-		SiteInfo:    siteInfo,
+	tg := tagsGenerator{&tagsConfig{
+		tagPostsMap: tagPostsMap,
+		template:    t,
+		siteInfo:    siteInfo,
 	}}
 	// categories
 	catPostsMap := createCatPostsMap(posts)
-	ct := CategoriesGenerator{&CategoriesConfig{
-		CatPostsMap: catPostsMap,
-		Template:    t,
-		Destination: destination,
-		SiteInfo:    siteInfo,
+	ct := categoriesGenerator{&categoriesConfig{
+		catPostsMap: catPostsMap,
+		template:    t,
+		destination: destination,
+		siteInfo:    siteInfo,
 	}}
 
 	// sitemap
-	sg := SitemapGenerator{&SitemapConfig{
-		Posts:            posts,
-		TagPostsMap:      tagPostsMap,
-		CategoryPostsMap: catPostsMap,
-		Destination:      destination,
-		BlogURL:          siteInfo.BlogURL,
+	sg := sitemapGenerator{&sitemapConfig{
+		posts:            posts,
+		tagPostsMap:      tagPostsMap,
+		categoryPostsMap: catPostsMap,
+		destination:      destination,
+		blogURL:          siteInfo.BlogURL,
 	}}
 	// rss
-	rg := RSSGenerator{&RSSConfig{
-		Posts:       posts,
-		Destination: destination,
-		SiteInfo:    siteInfo,
+	rg := rssGenerator{&rssConfig{
+		posts:       posts,
+		destination: destination,
+		siteInfo:    siteInfo,
 	}}
 	// statics
 	fileToDestination := make(map[string]string)
@@ -158,11 +158,11 @@ func runTasks(posts []*Post, t *template.Template, siteInfo *config.SiteInformat
 		}
 		fileToDestination[siteInfo.ThemeFolder+row.File] = fmt.Sprintf("%s/%s", destination, row.To)
 	}
-	statg := StaticsGenerator{&StaticsConfig{
-		FileToDestination: fileToDestination,
-		TemplateToFile:    templateToFile,
-		Template:          t,
-		SiteInfo:          siteInfo,
+	statg := staticsGenerator{&staticsConfig{
+		fileToDestination: fileToDestination,
+		templateToFile:    templateToFile,
+		template:          t,
+		siteInfo:          siteInfo,
 	}}
 	generators = append(generators, &ag, &tg, &ct, &sg, &rg, &statg)
 
@@ -256,37 +256,37 @@ func getHTMLTitle(pageTitle, blogTitle string) (title string) {
 	return fmt.Sprintf("%s - %s", pageTitle, blogTitle)
 }
 
-func createTagPostsMap(posts []*Post) (result map[string][]*Post) {
-	result = make(map[string][]*Post)
-	for _, post := range posts {
-		for _, tag := range post.Meta.Tags {
+func createTagPostsMap(posts []*post) (result map[string][]*post) {
+	result = make(map[string][]*post)
+	for _, p := range posts {
+		for _, tag := range p.meta.Tags {
 			key := strings.ToLower(tag)
 			if result[key] == nil {
-				result[key] = []*Post{post}
+				result[key] = []*post{p}
 			} else {
-				result[key] = append(result[key], post)
+				result[key] = append(result[key], p)
 			}
 		}
 	}
 	return result
 }
 
-func createCatPostsMap(posts []*Post) (result map[string][]*Post) {
-	result = make(map[string][]*Post)
-	for _, post := range posts {
-		for _, cat := range post.Meta.Categories {
+func createCatPostsMap(posts []*post) (result map[string][]*post) {
+	result = make(map[string][]*post)
+	for _, p := range posts {
+		for _, cat := range p.meta.Categories {
 			key := strings.ToLower(cat)
 			if result[key] == nil {
-				result[key] = []*Post{post}
+				result[key] = []*post{p}
 			} else {
-				result[key] = append(result[key], post)
+				result[key] = append(result[key], p)
 			}
 		}
 	}
 	return result
 }
 
-func getNumberOfPages(posts []*Post, postsPerPage int) (n int) {
+func getNumberOfPages(posts []*post, postsPerPage int) (n int) {
 	res := float64(len(posts)) / float64(postsPerPage)
 	n, _ = strconv.Atoi(fmt.Sprintf("%.0f", math.Ceil(res)))
 	return n

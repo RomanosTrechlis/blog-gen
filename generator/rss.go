@@ -9,32 +9,32 @@ import (
 	"github.com/beevik/etree"
 )
 
-// RSSGenerator object
-type RSSGenerator struct {
-	Config *RSSConfig
+// rssGenerator object
+type rssGenerator struct {
+	config *rssConfig
 }
 
-// RSSConfig holds the configuration for an RSS feed
-type RSSConfig struct {
-	Posts       []*Post
-	Destination string
-	SiteInfo    *config.SiteInformation
+// rssConfig holds the configuration for an RSS feed
+type rssConfig struct {
+	posts       []*post
+	destination string
+	siteInfo    *config.SiteInformation
 }
 
 const rssDateFormat string = "02 Jan 2006 15:04 -0700"
 
 // Generate creates an RSS feed
-func (g *RSSGenerator) Generate() (err error) {
+func (g *rssGenerator) Generate() (err error) {
 	fmt.Println("\tGenerating RSS...")
-	posts := g.Config.Posts
-	destination := g.Config.Destination
+	posts := g.config.posts
+	destination := g.config.destination
 	doc := etree.NewDocument()
 	doc.CreateProcInst("xml", `version="1.0" encoding="UTF-8"`)
 	rss := doc.CreateElement("rss")
 	rss.CreateAttr("xmlns:atom", "http://www.w3.org/2005/Atom")
 	rss.CreateAttr("version", "2.0")
 	channel := rss.CreateElement("channel")
-	siteInfo := g.Config.SiteInfo
+	siteInfo := g.config.siteInfo
 
 	channel.CreateElement("title").SetText(siteInfo.BlogTitle)
 	channel.CreateElement("link").SetText(siteInfo.BlogURL)
@@ -48,7 +48,7 @@ func (g *RSSGenerator) Generate() (err error) {
 	atomLink.CreateAttr("type", "application/rss+xml")
 
 	for _, post := range posts {
-		err := addItem(channel, post, fmt.Sprintf("%s/%s/", siteInfo.BlogURL, post.Name[1:]), siteInfo.DateFormat)
+		err := addItem(channel, post, fmt.Sprintf("%s/%s/", siteInfo.BlogURL, post.name[1:]), siteInfo.DateFormat)
 		if err != nil {
 			return err
 		}
@@ -68,8 +68,8 @@ func (g *RSSGenerator) Generate() (err error) {
 	return nil
 }
 
-func addItem(element *etree.Element, post *Post, path, dateFormat string) (err error) {
-	meta := post.Meta
+func addItem(element *etree.Element, post *post, path, dateFormat string) (err error) {
+	meta := post.meta
 	item := element.CreateElement("item")
 	item.CreateElement("title").SetText(meta.Title)
 	item.CreateElement("link").SetText(path)
@@ -79,6 +79,6 @@ func addItem(element *etree.Element, post *Post, path, dateFormat string) (err e
 		return fmt.Errorf("error parsing date %s: %v", meta.Date, err)
 	}
 	item.CreateElement("pubDate").SetText(pubDate.Format(rssDateFormat))
-	item.CreateElement("description").SetText(string(post.HTML))
+	item.CreateElement("description").SetText(string(post.html))
 	return nil
 }

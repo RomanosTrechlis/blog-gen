@@ -11,25 +11,25 @@ import (
 	"github.com/RomanosTrechlis/blog-generator/util/fs"
 )
 
-// StaticsGenerator object
-type StaticsGenerator struct {
-	Config *StaticsConfig
+// staticsGenerator object
+type staticsGenerator struct {
+	config *staticsConfig
 }
 
-// StaticsConfig holds the data for the static sites
-type StaticsConfig struct {
-	FileToDestination map[string]string
-	TemplateToFile    map[string]string
-	Template          *template.Template
-	SiteInfo          *config.SiteInformation
+// staticsConfig holds the data for the static sites
+type staticsConfig struct {
+	fileToDestination map[string]string
+	templateToFile    map[string]string
+	template          *template.Template
+	siteInfo          *config.SiteInformation
 }
 
 // Generate creates the static pages
-func (g *StaticsGenerator) Generate() (err error) {
+func (g *staticsGenerator) Generate() (err error) {
 	fmt.Println("\tCopying Statics...")
-	fileToDestination := g.Config.FileToDestination
-	templateToFile := g.Config.TemplateToFile
-	t := g.Config.Template
+	fileToDestination := g.config.fileToDestination
+	templateToFile := g.config.templateToFile
+	t := g.config.template
 	if len(fileToDestination) > 0 {
 		for k, v := range fileToDestination {
 			err := createFolderIfNotExist(getFolder(v))
@@ -52,7 +52,7 @@ func (g *StaticsGenerator) Generate() (err error) {
 			if err != nil {
 				return fmt.Errorf("error reading file %s: %v", k, err)
 			}
-			err = writeIndexHTML(getFolder(v), getTitle(k), template.HTML(content), t, g.Config.SiteInfo)
+			err = writeIndexHTML(getFolder(v), getTitle(k), template.HTML(content), t, g.config.siteInfo)
 			if err != nil {
 				return err
 			}

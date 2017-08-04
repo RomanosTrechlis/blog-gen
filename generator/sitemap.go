@@ -7,27 +7,27 @@ import (
 	"github.com/beevik/etree"
 )
 
-// SitemapGenerator object
-type SitemapGenerator struct {
-	Config *SitemapConfig
+// sitemapGenerator object
+type sitemapGenerator struct {
+	config *sitemapConfig
 }
 
-// SitemapConfig holds the config for the sitemap
-type SitemapConfig struct {
-	Posts            []*Post
-	TagPostsMap      map[string][]*Post
-	CategoryPostsMap map[string][]*Post
-	Destination      string
-	BlogURL          string
+// sitemapConfig holds the config for the sitemap
+type sitemapConfig struct {
+	posts            []*post
+	tagPostsMap      map[string][]*post
+	categoryPostsMap map[string][]*post
+	destination      string
+	blogURL          string
 }
 
 // Generate creates the sitemap
-func (g *SitemapGenerator) Generate() (err error) {
+func (g *sitemapGenerator) Generate() (err error) {
 	fmt.Println("\tGenerating Sitemap...")
-	posts := g.Config.Posts
-	tagPostsMap := g.Config.TagPostsMap
-	catPostsMap := g.Config.CategoryPostsMap
-	destination := g.Config.Destination
+	posts := g.config.posts
+	tagPostsMap := g.config.tagPostsMap
+	catPostsMap := g.config.categoryPostsMap
+	destination := g.config.destination
 	doc := etree.NewDocument()
 	doc.CreateProcInst("xml", `version="1.0" encoding="UTF-8"`)
 	urlSet := doc.CreateElement("urlset")
@@ -36,23 +36,23 @@ func (g *SitemapGenerator) Generate() (err error) {
 
 	url := urlSet.CreateElement("url")
 	loc := url.CreateElement("loc")
-	loc.SetText(g.Config.BlogURL)
+	loc.SetText(g.config.blogURL)
 
-	addURL(urlSet, "about", g.Config.BlogURL, nil)
-	addURL(urlSet, "archive", g.Config.BlogURL, nil)
-	addURL(urlSet, "tags", g.Config.BlogURL, nil)
-	addURL(urlSet, "categories", g.Config.BlogURL, nil)
+	addURL(urlSet, "about", g.config.blogURL, nil)
+	addURL(urlSet, "archive", g.config.blogURL, nil)
+	addURL(urlSet, "tags", g.config.blogURL, nil)
+	addURL(urlSet, "categories", g.config.blogURL, nil)
 
 	for tag := range tagPostsMap {
-		addURL(urlSet, tag, g.Config.BlogURL, nil)
+		addURL(urlSet, tag, g.config.blogURL, nil)
 	}
 
 	for cat := range catPostsMap {
-		addURL(urlSet, cat, g.Config.BlogURL, nil)
+		addURL(urlSet, cat, g.config.blogURL, nil)
 	}
 
 	for _, post := range posts {
-		addURL(urlSet, post.Name[1:], g.Config.BlogURL, post.Images)
+		addURL(urlSet, post.name[1:], g.config.blogURL, post.images)
 	}
 
 	filePath := fmt.Sprintf("%s/sitemap.xml", destination)
