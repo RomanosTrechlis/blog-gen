@@ -21,7 +21,7 @@ the blog are and where to put the generated files.
 "TempFolder": "./tmp",
 "ThemeFolder": "./static/"
 
-The folowing field specifies how many posts will be per page.
+The following field specifies how many posts will be per page.
 "NumPostsFrontPage": 10,
 
 The following snippet specifies the static pages and other artifacts like .css
@@ -62,7 +62,7 @@ func (cmd *generateCmd) Hidden() bool      { return false }
 func (cmd *generateCmd) Register(fs *flag.FlagSet) {
 }
 
-func (cmd *generateCmd) Run(ctx *Ctx, args []string) error {
+func (cmd *generateCmd) Run(ctx *ctx, args []string) error {
 	dirs, err := fs.GetContentFolders(cmd.siteInfo.TempFolder)
 	if err != nil {
 		return err

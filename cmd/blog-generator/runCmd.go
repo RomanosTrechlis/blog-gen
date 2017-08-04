@@ -11,7 +11,6 @@ const runLongHelp = `
 Runs a web server for the generated blog.
 
 The default port for the server is 8080.
-
 `
 
 type runCmd struct {
@@ -29,7 +28,7 @@ func (cmd *runCmd) Register(fs *flag.FlagSet) {
 	fs.IntVar(&cmd.port, "p", 8080, "port for web server")
 }
 
-func (cmd *runCmd) Run(ctx *Ctx, args []string) error {
+func (cmd *runCmd) Run(ctx *ctx, args []string) error {
 	fs := http.FileServer(http.Dir(cmd.source))
 	http.Handle("/", fs)
 

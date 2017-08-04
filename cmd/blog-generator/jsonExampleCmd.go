@@ -76,7 +76,7 @@ func (cmd *jsonExampleCmd) Hidden() bool      { return false }
 func (cmd *jsonExampleCmd) Register(fs *flag.FlagSet) {
 }
 
-func (cmd *jsonExampleCmd) Run(ctx *Ctx, args []string) error {
+func (cmd *jsonExampleCmd) Run(ctx *ctx, args []string) error {
 	ctx.Out.Print(jsonExampleLongHelp)
 	return nil
 }

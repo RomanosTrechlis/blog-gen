@@ -36,7 +36,7 @@ func (cmd *downloadPostCmd) Hidden() bool      { return false }
 func (cmd *downloadPostCmd) Register(fs *flag.FlagSet) {
 }
 
-func (cmd *downloadPostCmd) Run(ctx *Ctx, args []string) error {
+func (cmd *downloadPostCmd) Run(ctx *ctx, args []string) error {
 	ds, err := datasource.New(cmd.sourceType)
 	if err != nil {
 		ctx.Err.Fatal("please provide a datasource in the configuration file:", err)

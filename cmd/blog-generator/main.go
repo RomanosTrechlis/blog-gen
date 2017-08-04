@@ -13,13 +13,13 @@ import (
 	"github.com/RomanosTrechlis/blog-generator/cli"
 )
 
-type Ctx struct {
+type ctx struct {
 	WorkingDir string      // Where to execute.
 	Out, Err   *log.Logger // Required loggers.
 	Verbose    bool        // Enables more verbose logging.
 }
 
-type Config struct {
+type execConfig struct {
 	WorkingDir     string    // Where to execute
 	Args           []string  // Command-line arguments, starting with the program name.
 	Env            []string  // Environment variables
@@ -33,7 +33,7 @@ type command interface {
 	LongHelp() string       // "Foo the first bar meeting the following conditions..."
 	Register(*flag.FlagSet) // command-specific flags
 	Hidden() bool           // indicates whether the command should be hidden from help output
-	Run(*Ctx, []string) error
+	Run(*ctx, []string) error
 }
 
 func main() {
@@ -42,7 +42,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, "failed to get working directory", err)
 		os.Exit(1)
 	}
-	c := &Config{
+	c := &execConfig{
 		Args:       os.Args,
 		Stdout:     os.Stdout,
 		Stderr:     os.Stderr,
@@ -52,7 +52,7 @@ func main() {
 	os.Exit(c.Run())
 }
 
-func (c *Config) Run() (exitCode int) {
+func (c *execConfig) Run() (exitCode int) {
 	siteInfo := cli.ReadConfig("config.json")
 	commands := []command{
 		&downloadPostCmd{
@@ -155,7 +155,7 @@ func (c *Config) Run() (exitCode int) {
 			}
 
 			// Set up context.
-			ctx := &Ctx{
+			ctx := &ctx{
 				Out:     outLogger,
 				Err:     errLogger,
 				Verbose: *verbose,

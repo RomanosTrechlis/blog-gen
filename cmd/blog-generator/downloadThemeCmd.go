@@ -36,7 +36,7 @@ func (cmd *downloadThemeCmd) Hidden() bool      { return false }
 func (cmd *downloadThemeCmd) Register(fs *flag.FlagSet) {
 }
 
-func (cmd *downloadThemeCmd) Run(ctx *Ctx, args []string) error {
+func (cmd *downloadThemeCmd) Run(ctx *ctx, args []string) error {
 	ds, err := datasource.New(cmd.sourceType)
 	if err != nil {
 		ctx.Err.Fatal("please provide a datasource in the configuration file:", err)
