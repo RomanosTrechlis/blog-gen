@@ -35,6 +35,19 @@ type listingConfig struct {
 	maxPageNum             int
 }
 
+func newListingConfig(posts []*post, template *template.Template, siteInfo *config.SiteInformation,
+	destination, pageTitle string, pageNum, maxPageNum int) *listingConfig {
+	return &listingConfig{
+		posts:       posts,
+		template:    template,
+		destination: destination,
+		pageTitle:   pageTitle,
+		pageNum:     pageNum,
+		maxPageNum:  maxPageNum,
+		siteInfo:    siteInfo,
+	}
+}
+
 var shortTemplatePath string
 
 // Generate starts the listing generation

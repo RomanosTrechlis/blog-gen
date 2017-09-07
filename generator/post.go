@@ -43,6 +43,15 @@ type postConfig struct {
 	destination string
 }
 
+func newPostConfig(post *post, destination string, template *template.Template, siteInfo *config.SiteInformation) *postConfig {
+	return &postConfig{
+		post:        post,
+		destination: destination,
+		template:    template,
+		siteInfo:    siteInfo,
+	}
+}
+
 // Generate generates a post
 func (g *postGenerator) Generate() (err error) {
 	post := g.config.post

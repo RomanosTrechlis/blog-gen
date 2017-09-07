@@ -78,12 +78,7 @@ func runTasks(posts []*post, t *template.Template, siteInfo *config.SiteInformat
 
 	//posts
 	for _, post := range posts {
-		pg := postGenerator{&postConfig{
-			post:        post,
-			destination: destination,
-			template:    t,
-			siteInfo:    siteInfo,
-		}}
+		pg := postGenerator{newPostConfig(post, destination, t, siteInfo)}
 		generators = append(generators, &pg)
 	}
 	tagPostsMap := createTagPostsMap(posts)
@@ -100,25 +95,11 @@ func runTasks(posts []*post, t *template.Template, siteInfo *config.SiteInformat
 		if (i + 1) == numOfPages {
 			toP = len(posts)
 		}
-		generators = append(generators, &listingGenerator{&listingConfig{
-			posts:       posts[i*paging : toP],
-			template:    t,
-			destination: to,
-			pageTitle:   "",
-			pageNum:     i + 1,
-			maxPageNum:  numOfPages,
-			siteInfo:    siteInfo,
-		}})
+		generators = append(generators, &listingGenerator{newListingConfig(posts[i*paging : toP], t, siteInfo, to, "", i + 1, numOfPages)})
 	}
 
 	// archive
-	ag := listingGenerator{&listingConfig{
-		posts:       posts,
-		template:    t,
-		destination: fmt.Sprintf("%s/archive", destination),
-		pageTitle:   "Archive",
-		siteInfo:    siteInfo,
-	}}
+	ag := listingGenerator{newListingConfig(posts, t, siteInfo, fmt.Sprintf("%s/archive", destination), "Archive", 0, 0)}
 	// tags
 	tg := tagsGenerator{&tagsConfig{
 		tagPostsMap: tagPostsMap,
