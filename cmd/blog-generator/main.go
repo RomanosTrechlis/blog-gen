@@ -23,7 +23,7 @@ func createCommandTree(siteInfo config.SiteInformation) *cli.CLI {
 func main() {
 	args := os.Args[1:]
 	line := ""
-	siteInfo, err := config.NewSiteInformation("config.json")
+	siteInfo, err := config.New("config.json")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "config.json reading error: %v\n", err)
 		args = append(args, "-h")
