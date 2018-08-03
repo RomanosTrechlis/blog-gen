@@ -12,7 +12,7 @@ import (
 
 // ReadConfig creates object holding site information
 func ReadConfig(configFile string) (siteInfo config.SiteInformation) {
-	s, _ := config.NewSiteInformation(configFile)
+	s, _ := config.New(configFile)
 	return s
 }
 

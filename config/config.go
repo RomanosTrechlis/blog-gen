@@ -1,3 +1,5 @@
+// Package config fills SiteInformation struct that contains
+// all the necessary configuration for creating the blog.
 package config
 
 import (
@@ -50,32 +52,32 @@ type Upload struct {
 	Password string `json:Password`
 }
 
-func NewSiteInformation(configFile string) (SiteInformation, error)  {
+func New(configFile string) (SiteInformation, error)  {
 	data, err := ioutil.ReadFile(configFile)
 	if err != nil {
 		return SiteInformation{}, fmt.Errorf("error accessing directory %s: %v", configFile, err)
 	}
 	siteInfo := new(SiteInformation)
-	(siteInfo).ParseJSON(data)
-	return fillDefaultValues(*siteInfo), nil
+	siteInfo.ParseJSON(data)
+	siteInfo.fillDefaultValues()
+	return *siteInfo, nil
 }
 
-func (c *SiteInformation) ParseJSON(b []byte) (err error) {
-	return json.Unmarshal(b, &c)
+func (si *SiteInformation) ParseJSON(b []byte) (err error) {
+	return json.Unmarshal(b, &si)
 }
 
-func fillDefaultValues(siteInfo SiteInformation) SiteInformation {
-	if siteInfo.TempFolder == "" {
-		siteInfo.TempFolder = "./tmp"
+func (si *SiteInformation) fillDefaultValues() {
+	if si.TempFolder == "" {
+		si.TempFolder = "./tmp"
 	}
-	if siteInfo.DestFolder == "" {
-		siteInfo.DestFolder = "./public"
+	if si.DestFolder == "" {
+		si.DestFolder = "./public"
 	}
-	if siteInfo.ThemeFolder == "" {
-		siteInfo.DestFolder = "./static"
+	if si.ThemeFolder == "" {
+		si.DestFolder = "./static"
 	}
-	if siteInfo.NumPostsFrontPage == 0 {
-		siteInfo.NumPostsFrontPage = 10
+	if si.NumPostsFrontPage == 0 {
+		si.NumPostsFrontPage = 10
 	}
-	return siteInfo
 }
