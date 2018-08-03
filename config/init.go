@@ -3,7 +3,7 @@ package config
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
+	"fmt"
 )
 
 type BlogInformation interface {
@@ -50,13 +50,14 @@ type Upload struct {
 	Password string `json:Password`
 }
 
-func NewSiteInformation(configFile string) (siteInfo SiteInformation) {
+func NewSiteInformation(configFile string) (SiteInformation, error)  {
 	data, err := ioutil.ReadFile(configFile)
 	if err != nil {
-		log.Fatal("error accessing directory %s: %v", configFile, err)
+		return SiteInformation{}, fmt.Errorf("error accessing directory %s: %v", configFile, err)
 	}
-	(&siteInfo).ParseJSON(data)
-	return fillDefaultValues(siteInfo)
+	siteInfo := new(SiteInformation)
+	(siteInfo).ParseJSON(data)
+	return fillDefaultValues(*siteInfo), nil
 }
 
 func (c *SiteInformation) ParseJSON(b []byte) (err error) {
