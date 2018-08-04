@@ -52,7 +52,7 @@ type Upload struct {
 	Password string `json:Password`
 }
 
-func New(configFile string) (SiteInformation, error)  {
+func New(configFile string) (SiteInformation, error) {
 	data, err := ioutil.ReadFile(configFile)
 	if err != nil {
 		return SiteInformation{}, fmt.Errorf("error accessing directory %s: %v", configFile, err)

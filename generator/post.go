@@ -7,11 +7,12 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+
 	"github.com/PuerkitoBio/goquery"
-	"github.com/russross/blackfriday"
-	"github.com/sourcegraph/syntaxhighlight"
 	"github.com/RomanosTrechlis/blog-generator/config"
 	"github.com/RomanosTrechlis/blog-generator/util/fs"
+	"github.com/russross/blackfriday"
+	"github.com/sourcegraph/syntaxhighlight"
 )
 
 // post holds data for a post
@@ -51,14 +52,14 @@ func (g *postGenerator) Generate() (err error) {
 	}
 
 	c := htmlConfig{
-		path: staticPath,
-		pageTitle: post.meta.Title,
-		pageNum: 0,
+		path:       staticPath,
+		pageTitle:  post.meta.Title,
+		pageNum:    0,
 		maxPageNum: 0,
-		isPost: true,
-		temp: g.template,
-		content: template.HTML(string(post.html)),
-		siteInfo: g.siteInfo,
+		isPost:     true,
+		temp:       g.template,
+		content:    template.HTML(string(post.html)),
+		siteInfo:   g.siteInfo,
 	}
 	err = c.writeHTML()
 	if err != nil {

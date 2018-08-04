@@ -146,7 +146,7 @@ The default port for the server is 8080.
 `
 
 	execAllShortHelp = `Sequential execution of all commands`
-	execAllLongHelp = `Sequential execution of all commands.
+	execAllLongHelp  = `Sequential execution of all commands.
 
 Downloads posts, and theme, then generates the blog and runs a web server.
 `

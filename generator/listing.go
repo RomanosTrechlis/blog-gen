@@ -64,14 +64,14 @@ func (g *listingGenerator) Generate() (err error) {
 	}
 
 	c := htmlConfig{
-		path:g.destination,
-		pageTitle: g.pageTitle,
-		pageNum: g.pageNum,
+		path:       g.destination,
+		pageTitle:  g.pageTitle,
+		pageNum:    g.pageNum,
 		maxPageNum: g.maxPageNum,
-		isPost: false,
-		temp: g.template,
-		content: htmlBlocks,
-		siteInfo: g.siteInfo,
+		isPost:     false,
+		temp:       g.template,
+		content:    htmlBlocks,
+		siteInfo:   g.siteInfo,
 	}
 	err = c.writeHTML()
 	if err != nil {

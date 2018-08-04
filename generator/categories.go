@@ -17,9 +17,6 @@ type Category struct {
 	Count int
 }
 
-// categoryByCountDesc sorts the cats
-type categoryByCountDesc []*Category
-
 // categoriesGenerator struct
 type categoriesGenerator struct {
 	catPostsMap map[string][]*post
@@ -71,14 +68,14 @@ func (g *categoriesGenerator) generateCatIndex() (err error) {
 	}
 
 	c := htmlConfig{
-		path: fmt.Sprintf("%s/categories", g.destination),
-		pageTitle: "Categories",
-		pageNum: 0,
+		path:       fmt.Sprintf("%s/categories", g.destination),
+		pageTitle:  "Categories",
+		pageNum:    0,
 		maxPageNum: 0,
-		isPost: false,
-		temp: g.template,
-		content: template.HTML(buf.String()),
-		siteInfo: g.siteInfo,
+		isPost:     false,
+		temp:       g.template,
+		content:    template.HTML(buf.String()),
+		siteInfo:   g.siteInfo,
 	}
 	err = c.writeHTML()
 	if err != nil {
@@ -110,6 +107,9 @@ func getCatLink(cat string) (link string) {
 	link = fmt.Sprintf("/categories/%s/", strings.ToLower(cat))
 	return link
 }
+
+// categoryByCountDesc sorts the cats
+type categoryByCountDesc []*Category
 
 func (t categoryByCountDesc) Len() (l int) {
 	return len(t)

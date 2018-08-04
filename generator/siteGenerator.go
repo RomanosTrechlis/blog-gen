@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"math"
 	"os"
 	"sort"
@@ -13,7 +14,6 @@ import (
 	"time"
 
 	"github.com/RomanosTrechlis/blog-generator/config"
-	"io/ioutil"
 	"gopkg.in/yaml.v2"
 )
 
@@ -128,7 +128,7 @@ func (g *siteGenerator) createTasks(posts []*post, t *template.Template) []Gener
 		if (i + 1) == numOfPages {
 			toP = len(posts)
 		}
-		lg := &listingGenerator{posts[i*paging:toP], t, g.SiteInfo, to, "", i+1, numOfPages}
+		lg := &listingGenerator{posts[i*paging : toP], t, g.SiteInfo, to, "", i + 1, numOfPages}
 		generators = append(generators, lg)
 	}
 
@@ -219,14 +219,14 @@ func (g *siteGenerator) runTasks(generators []Generator) (err error) {
 }
 
 type htmlConfig struct {
-	path string
-	pageTitle string
-	pageNum int
+	path       string
+	pageTitle  string
+	pageNum    int
 	maxPageNum int
-	isPost bool
-	temp *template.Template
-	content template.HTML
-	siteInfo *config.SiteInformation
+	isPost     bool
+	temp       *template.Template
+	content    template.HTML
+	siteInfo   *config.SiteInformation
 }
 
 func (h htmlConfig) writeHTML() error {

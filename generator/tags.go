@@ -70,14 +70,14 @@ func (g *tagsGenerator) generateTagIndex() (err error) {
 	}
 
 	c := htmlConfig{
-		path: tagsPath,
-		pageTitle: "Tags",
-		pageNum: 0,
+		path:       tagsPath,
+		pageTitle:  "Tags",
+		pageNum:    0,
 		maxPageNum: 0,
-		isPost: false,
-		temp: g.template,
-		content: template.HTML(buf.String()),
-		siteInfo: g.siteInfo,
+		isPost:     false,
+		temp:       g.template,
+		content:    template.HTML(buf.String()),
+		siteInfo:   g.siteInfo,
 	}
 	err = c.writeHTML()
 	if err != nil {

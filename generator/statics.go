@@ -70,14 +70,14 @@ func (g *staticsGenerator) resolveTemplateToFile() error {
 		}
 
 		c := htmlConfig{
-			path: getFolder(v),
-			pageTitle: getTitle(k),
-			pageNum: 0,
+			path:       getFolder(v),
+			pageTitle:  getTitle(k),
+			pageNum:    0,
 			maxPageNum: 0,
-			isPost: false,
-			temp: g.template,
-			content: template.HTML(content),
-			siteInfo: g.siteInfo,
+			isPost:     false,
+			temp:       g.template,
+			content:    template.HTML(content),
+			siteInfo:   g.siteInfo,
 		}
 		err = c.writeHTML()
 		if err != nil {
