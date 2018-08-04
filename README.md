@@ -1,4 +1,7 @@
 # static-site-generator
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/RomanosTrechlis/blog-generator)](https://goreportcard.com/report/github.com/RomanosTrechlis/blog-generator)
+
 For this project I used the core ideas of [Mario Zupan's](https://zupzup.org/) blog generator and altered them to fit my needs.
 
 Zupzup explains everythin in [this](https://zupzup.org/static-blog-generator-go/) blog post, so I will continue from where he stopped.
