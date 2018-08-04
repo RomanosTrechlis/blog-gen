@@ -47,7 +47,18 @@ func (g *staticsGenerator) Generate() (err error) {
 			if err != nil {
 				return fmt.Errorf("error reading file %s: %v", k, err)
 			}
-			err = writeIndexHTML(getFolder(v), getTitle(k), template.HTML(content), t, g.siteInfo)
+
+			c := htmlConfig{
+				path: getFolder(v),
+				pageTitle: getTitle(k),
+				pageNum: 0,
+				maxPageNum: 0,
+				isPost: false,
+				temp: t,
+				content: template.HTML(content),
+				siteInfo: g.siteInfo,
+			}
+			err = c.writeHTML()
 			if err != nil {
 				return err
 			}

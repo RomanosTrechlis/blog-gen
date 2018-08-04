@@ -68,7 +68,18 @@ func (g *tagsGenerator) generateTagIndex() (err error) {
 	if err != nil {
 		return fmt.Errorf("error executing template %s: %v", tagsTemplatePath, err)
 	}
-	err = writeIndexHTML(tagsPath, "Tags", template.HTML(buf.String()), g.template, g.siteInfo)
+
+	c := htmlConfig{
+		path: tagsPath,
+		pageTitle: "Tags",
+		pageNum: 0,
+		maxPageNum: 0,
+		isPost: false,
+		temp: g.template,
+		content: template.HTML(buf.String()),
+		siteInfo: g.siteInfo,
+	}
+	err = c.writeHTML()
 	if err != nil {
 		return err
 	}

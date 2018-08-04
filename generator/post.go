@@ -50,7 +50,17 @@ func (g *postGenerator) Generate() (err error) {
 		}
 	}
 
-	err = writeIndexHTMLPost(staticPath, post.meta.Title, template.HTML(string(post.html)), g.template, g.siteInfo, true)
+	c := htmlConfig{
+		path: staticPath,
+		pageTitle: post.meta.Title,
+		pageNum: 0,
+		maxPageNum: 0,
+		isPost: true,
+		temp: g.template,
+		content: template.HTML(string(post.html)),
+		siteInfo: g.siteInfo,
+	}
+	err = c.writeHTML()
 	if err != nil {
 		return err
 	}

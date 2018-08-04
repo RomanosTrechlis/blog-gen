@@ -69,7 +69,18 @@ func (g *categoriesGenerator) generateCatIndex() (err error) {
 	if err != nil {
 		return fmt.Errorf("error executing template %s: %v", catTemplatePath, err)
 	}
-	err = writeIndexHTML(fmt.Sprintf("%s/categories", g.destination), "Categories", template.HTML(buf.String()), g.template, g.siteInfo)
+
+	c := htmlConfig{
+		path: fmt.Sprintf("%s/categories", g.destination),
+		pageTitle: "Categories",
+		pageNum: 0,
+		maxPageNum: 0,
+		isPost: false,
+		temp: g.template,
+		content: template.HTML(buf.String()),
+		siteInfo: g.siteInfo,
+	}
+	err = c.writeHTML()
 	if err != nil {
 		return err
 	}

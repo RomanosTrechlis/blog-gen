@@ -62,7 +62,18 @@ func (g *listingGenerator) Generate() (err error) {
 			return fmt.Errorf("error creating directory at %s: %v", g.destination, err)
 		}
 	}
-	err = writeIndexHTMLPlus(g.destination, g.pageTitle, htmlBlocks, g.template, g.siteInfo, false, g.pageNum, g.maxPageNum)
+
+	c := htmlConfig{
+		path:g.destination,
+		pageTitle: g.pageTitle,
+		pageNum: g.pageNum,
+		maxPageNum: g.maxPageNum,
+		isPost: false,
+		temp: g.template,
+		content: htmlBlocks,
+		siteInfo: g.siteInfo,
+	}
+	err = c.writeHTML()
 	if err != nil {
 		return err
 	}

@@ -218,44 +218,45 @@ func (g *siteGenerator) runTasks(generators []Generator) (err error) {
 	return nil
 }
 
-func writeIndexHTML(path, pageTitle string, content template.HTML, t *template.Template, siteInfo *config.SiteInformation) (err error) {
-	return writeIndexHTMLPlus(path, pageTitle, content, t, siteInfo, false, 0, 0)
+type htmlConfig struct {
+	path string
+	pageTitle string
+	pageNum int
+	maxPageNum int
+	isPost bool
+	temp *template.Template
+	content template.HTML
+	siteInfo *config.SiteInformation
 }
 
-func writeIndexHTMLPost(path, pageTitle string, content template.HTML, t *template.Template, siteInfo *config.SiteInformation,
-	isPost bool) (err error) {
-	return writeIndexHTMLPlus(path, pageTitle, content, t, siteInfo, isPost, 0, 0)
-}
-
-func writeIndexHTMLPlus(path, pageTitle string, content template.HTML, t *template.Template, siteInfo *config.SiteInformation,
-	isPost bool, page, maxPage int) (err error) {
-	filePath := fmt.Sprintf("%s/index.html", path)
+func (h htmlConfig) writeHTML() error {
+	filePath := fmt.Sprintf("%s/index.html", h.path)
 	f, err := os.Create(filePath)
 	if err != nil {
 		return fmt.Errorf("error creating file %s: %v", filePath, err)
 	}
 	defer f.Close()
 	w := bufio.NewWriter(f)
-	next := page + 1
-	prev := page - 1
-	if page == maxPage {
+	next := h.pageNum + 1
+	prev := h.pageNum - 1
+	if h.pageNum == h.maxPageNum {
 		next = 0
 	}
 	td := IndexData{
-		Name:          siteInfo.Author,
+		Name:          h.siteInfo.Author,
 		Year:          time.Now().Year(),
-		HTMLTitle:     getHTMLTitle(pageTitle, siteInfo.BlogTitle),
-		PageTitle:     pageTitle,
-		Content:       content,
-		CanonicalLink: buildCanonicalLink(path, siteInfo.BlogURL),
-		PageNum:       page,
+		HTMLTitle:     getHTMLTitle(h.pageTitle, h.siteInfo.BlogTitle),
+		PageTitle:     h.pageTitle,
+		Content:       h.content,
+		CanonicalLink: buildCanonicalLink(h.path, h.siteInfo.BlogURL),
+		PageNum:       h.pageNum,
 		NextPageNum:   next,
 		PrevPageNum:   prev,
-		URL:           buildCanonicalLink(path, siteInfo.BlogURL),
-		IsPost:        isPost,
+		URL:           buildCanonicalLink(h.path, h.siteInfo.BlogURL),
+		IsPost:        h.isPost,
 	}
 
-	err = t.Execute(w, td)
+	err = h.temp.Execute(w, td)
 	if err != nil {
 		return fmt.Errorf("error executing template %s: %v", templatePath, err)
 	}
