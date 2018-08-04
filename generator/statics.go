@@ -20,51 +20,70 @@ type staticsGenerator struct {
 }
 
 // Generate creates the static pages
-func (g *staticsGenerator) Generate() (err error) {
+func (g *staticsGenerator) Generate() error {
 	fmt.Println("\tCopying Statics...")
-	fileToDestination := g.fileToDestination
-	templateToFile := g.templateToFile
-	t := g.template
-	if len(fileToDestination) > 0 {
-		for k, v := range fileToDestination {
-			err := createFolderIfNotExist(getFolder(v))
-			if err != nil {
-				return err
-			}
-			err = fs.CopyFile(k, v)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	if len(templateToFile) > 0 {
-		for k, v := range templateToFile {
-			err := createFolderIfNotExist(getFolder(v))
-			if err != nil {
-				return err
-			}
-			content, err := ioutil.ReadFile(k)
-			if err != nil {
-				return fmt.Errorf("error reading file %s: %v", k, err)
-			}
 
-			c := htmlConfig{
-				path: getFolder(v),
-				pageTitle: getTitle(k),
-				pageNum: 0,
-				maxPageNum: 0,
-				isPost: false,
-				temp: t,
-				content: template.HTML(content),
-				siteInfo: g.siteInfo,
-			}
-			err = c.writeHTML()
-			if err != nil {
-				return err
-			}
+	err := g.resolveFileToDestination()
+	if err != nil {
+		return err
+	}
+
+	err = g.resolveTemplateToFile()
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("\tFinished copying statics...")
+	return nil
+}
+
+func (g *staticsGenerator) resolveFileToDestination() error {
+	if len(g.fileToDestination) == 0 {
+		return nil
+	}
+
+	for k, v := range g.fileToDestination {
+		err := createFolderIfNotExist(getFolder(v))
+		if err != nil {
+			return err
+		}
+		err = fs.CopyFile(k, v)
+		if err != nil {
+			return err
 		}
 	}
-	fmt.Println("\tFinished copying statics...")
+	return nil
+}
+
+func (g *staticsGenerator) resolveTemplateToFile() error {
+	if len(g.templateToFile) == 0 {
+		return nil
+	}
+	for k, v := range g.templateToFile {
+		err := createFolderIfNotExist(getFolder(v))
+		if err != nil {
+			return err
+		}
+		content, err := ioutil.ReadFile(k)
+		if err != nil {
+			return fmt.Errorf("error reading file %s: %v", k, err)
+		}
+
+		c := htmlConfig{
+			path: getFolder(v),
+			pageTitle: getTitle(k),
+			pageNum: 0,
+			maxPageNum: 0,
+			isPost: false,
+			temp: g.template,
+			content: template.HTML(content),
+			siteInfo: g.siteInfo,
+		}
+		err = c.writeHTML()
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
