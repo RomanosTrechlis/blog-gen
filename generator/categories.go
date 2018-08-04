@@ -20,41 +20,31 @@ type Category struct {
 // categoryByCountDesc sorts the cats
 type categoryByCountDesc []*Category
 
-// categoriesGenerator object
+// categoriesGenerator struct
 type categoriesGenerator struct {
-	config *categoriesConfig
-}
-
-// CategoriesConfig holds the category's config
-type categoriesConfig struct {
 	catPostsMap map[string][]*post
 	template    *template.Template
 	destination string
 	siteInfo    *config.SiteInformation
 }
 
-var catTemplatePath string
-
 // Generate creates the categories page
 func (g *categoriesGenerator) Generate() (err error) {
 	fmt.Println("\tGenerating Categories...")
-	siteInfo := g.config.siteInfo
-	catTemplatePath = siteInfo.ThemeFolder + "categories.html"
-	catPostsMap := g.config.catPostsMap
-	t := g.config.template
-	destination := g.config.destination
+	catPostsMap := g.catPostsMap
+	destination := g.destination
 	catsPath := fmt.Sprintf("%s/categories", destination)
 	err = clearAndCreateDestination(catsPath)
 	if err != nil {
 		return err
 	}
-	err = generateCatIndex(catPostsMap, t, catsPath, siteInfo)
+	err = g.generateCatIndex()
 	if err != nil {
 		return err
 	}
 	for cat, catPosts := range catPostsMap {
 		catPagePath := fmt.Sprintf("%s/%s", catsPath, cat)
-		err = generateCatPage(cat, catPosts, t, catPagePath, siteInfo)
+		err = g.generateCatPage(cat, catPosts, catPagePath)
 		if err != nil {
 			return err
 		}
@@ -63,14 +53,14 @@ func (g *categoriesGenerator) Generate() (err error) {
 	return nil
 }
 
-func generateCatIndex(catPostsMap map[string][]*post, t *template.Template,
-	destination string, siteInfo *config.SiteInformation) (err error) {
+func (g *categoriesGenerator) generateCatIndex() (err error) {
+	catTemplatePath := g.siteInfo.ThemeFolder + "categories.html"
 	tmpl, err := getTemplate(catTemplatePath)
 	if err != nil {
 		return err
 	}
 	categories := []*Category{}
-	for cat, posts := range catPostsMap {
+	for cat, posts := range g.catPostsMap {
 		categories = append(categories, &Category{Name: cat, Link: getCatLink(cat), Count: len(posts)})
 	}
 	sort.Sort(categoryByCountDesc(categories))
@@ -79,26 +69,25 @@ func generateCatIndex(catPostsMap map[string][]*post, t *template.Template,
 	if err != nil {
 		return fmt.Errorf("error executing template %s: %v", catTemplatePath, err)
 	}
-	err = writeIndexHTML(destination, "Categories", template.HTML(buf.String()), t, siteInfo)
+	err = writeIndexHTML(fmt.Sprintf("%s/categories", g.destination), "Categories", template.HTML(buf.String()), g.template, g.siteInfo)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func generateCatPage(cat string, posts []*post, t *template.Template,
-	destination string, siteInfo *config.SiteInformation) (err error) {
-	err = clearAndCreateDestination(destination)
+func (g *categoriesGenerator) generateCatPage(cat string, posts []*post, path string) (err error) {
+	err = clearAndCreateDestination(path)
 	if err != nil {
 		return err
 	}
-	lg := listingGenerator{&listingConfig{
+	lg := listingGenerator{
 		posts:       posts,
-		template:    t,
-		destination: destination,
+		template:    g.template,
+		destination: path,
 		pageTitle:   cat,
-		siteInfo:    siteInfo,
-	}}
+		siteInfo:    g.siteInfo,
+	}
 	err = lg.Generate()
 	if err != nil {
 		return err

@@ -13,11 +13,6 @@ import (
 
 // staticsGenerator object
 type staticsGenerator struct {
-	config *staticsConfig
-}
-
-// staticsConfig holds the data for the static sites
-type staticsConfig struct {
 	fileToDestination map[string]string
 	templateToFile    map[string]string
 	template          *template.Template
@@ -27,9 +22,9 @@ type staticsConfig struct {
 // Generate creates the static pages
 func (g *staticsGenerator) Generate() (err error) {
 	fmt.Println("\tCopying Statics...")
-	fileToDestination := g.config.fileToDestination
-	templateToFile := g.config.templateToFile
-	t := g.config.template
+	fileToDestination := g.fileToDestination
+	templateToFile := g.templateToFile
+	t := g.template
 	if len(fileToDestination) > 0 {
 		for k, v := range fileToDestination {
 			err := createFolderIfNotExist(getFolder(v))
@@ -52,7 +47,7 @@ func (g *staticsGenerator) Generate() (err error) {
 			if err != nil {
 				return fmt.Errorf("error reading file %s: %v", k, err)
 			}
-			err = writeIndexHTML(getFolder(v), getTitle(k), template.HTML(content), t, g.config.siteInfo)
+			err = writeIndexHTML(getFolder(v), getTitle(k), template.HTML(content), t, g.siteInfo)
 			if err != nil {
 				return err
 			}

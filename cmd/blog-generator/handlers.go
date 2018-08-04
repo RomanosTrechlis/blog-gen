@@ -48,10 +48,7 @@ func getGenerateHandler(siteInfo config.SiteInformation) func(flags map[string]s
 		if err != nil {
 			return fmt.Errorf("failed to get contentes from %s: %v", siteInfo.TempFolder, err)
 		}
-		g := generator.NewSiteGenerator(&generator.SiteConfig{
-			Sources:  dirs,
-			SiteInfo: &siteInfo,
-		})
+		g := generator.NewSiteGenerator(dirs, &siteInfo)
 
 		err = g.Generate()
 		return fmt.Errorf("failed to generate blog: %v", err)
@@ -110,10 +107,7 @@ func getExecAllHandler(c *cli.CLI, siteInfo config.SiteInformation) func(flags m
 		if err != nil {
 			return fmt.Errorf("failed to get contentes from %s: %v", siteInfo.TempFolder, err)
 		}
-		g := generator.NewSiteGenerator(&generator.SiteConfig{
-			Sources:  dirs,
-			SiteInfo: &siteInfo,
-		})
+		g := generator.NewSiteGenerator(dirs, &siteInfo)
 		err = g.Generate()
 		if err != nil {
 			return fmt.Errorf("failed to generate blog: %v", err)

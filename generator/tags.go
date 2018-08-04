@@ -21,39 +21,28 @@ type byCountDesc []*Tag
 
 // tagsGenerator object
 type tagsGenerator struct {
-	config *tagsConfig
-}
-
-// tagsConfig holds the tag's config
-type tagsConfig struct {
 	tagPostsMap map[string][]*post
 	template    *template.Template
 	siteInfo    *config.SiteInformation
 }
 
-var tagsTemplatePath string
-
 // Generate creates the tags page
 func (g *tagsGenerator) Generate() (err error) {
 	fmt.Println("\tGenerating Tags...")
-	siteInfo := g.config.siteInfo
+	siteInfo := g.siteInfo
 
-	tagsTemplatePath = siteInfo.ThemeFolder + "tags.html"
-	tagPostsMap := g.config.tagPostsMap
-	t := g.config.template
-	destination := siteInfo.DestFolder
-	tagsPath := fmt.Sprintf("%s/tags", destination)
+	tagPostsMap := g.tagPostsMap
+	tagsPath := fmt.Sprintf("%s/tags", siteInfo.DestFolder)
 	err = clearAndCreateDestination(tagsPath)
 	if err != nil {
 		return err
 	}
-	err = generateTagIndex(tagPostsMap, t, tagsPath, siteInfo)
+	err = g.generateTagIndex()
 	if err != nil {
 		return err
 	}
 	for tag, tagPosts := range tagPostsMap {
-		tagPagePath := fmt.Sprintf("%s/%s", tagsPath, tag)
-		err := generateTagPage(tagPagePath, tag, tagPosts, t, siteInfo)
+		err := g.generateTagPage(tag, tagPosts)
 		if err != nil {
 			return err
 		}
@@ -62,13 +51,15 @@ func (g *tagsGenerator) Generate() (err error) {
 	return nil
 }
 
-func generateTagIndex(tagPostsMap map[string][]*post, t *template.Template, tagsPath string, siteInfo *config.SiteInformation) (err error) {
+func (g *tagsGenerator) generateTagIndex() (err error) {
+	tagsPath := fmt.Sprintf("%s/tags", g.siteInfo.DestFolder)
+	tagsTemplatePath := g.siteInfo.ThemeFolder + "tags.html"
 	tmpl, err := getTemplate(tagsTemplatePath)
 	if err != nil {
 		return err
 	}
-	tags := []*Tag{}
-	for tag, posts := range tagPostsMap {
+	tags := make([]*Tag, 0)
+	for tag, posts := range g.tagPostsMap {
 		tags = append(tags, &Tag{Name: tag, Link: getTagLink(tag), Count: len(posts)})
 	}
 	sort.Sort(byCountDesc(tags))
@@ -77,25 +68,26 @@ func generateTagIndex(tagPostsMap map[string][]*post, t *template.Template, tags
 	if err != nil {
 		return fmt.Errorf("error executing template %s: %v", tagsTemplatePath, err)
 	}
-	err = writeIndexHTML(tagsPath, "Tags", template.HTML(buf.String()), t, siteInfo)
+	err = writeIndexHTML(tagsPath, "Tags", template.HTML(buf.String()), g.template, g.siteInfo)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func generateTagPage(destination, tag string, posts []*post, t *template.Template, siteInfo *config.SiteInformation) (err error) {
-	err = clearAndCreateDestination(destination)
+func (g *tagsGenerator) generateTagPage(tag string, posts []*post) (err error) {
+	tagPagePath := fmt.Sprintf("%s/%s/%s", g.siteInfo.DestFolder, "tags", tag)
+	err = clearAndCreateDestination(tagPagePath)
 	if err != nil {
 		return err
 	}
-	lg := listingGenerator{&listingConfig{
+	lg := listingGenerator{
 		posts:       posts,
-		template:    t,
+		template:    g.template,
 		pageTitle:   tag,
-		siteInfo:    siteInfo,
-		destination: destination,
-	}}
+		siteInfo:    g.siteInfo,
+		destination: tagPagePath,
+	}
 
 	err = lg.Generate()
 	if err != nil {

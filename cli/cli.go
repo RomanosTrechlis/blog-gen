@@ -36,10 +36,7 @@ func Generate(siteInfo *config.SiteInformation) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	g := generator.NewSiteGenerator(&generator.SiteConfig{
-		Sources:  dirs,
-		SiteInfo: siteInfo,
-	})
+	g := generator.NewSiteGenerator(dirs, siteInfo)
 
 	err = g.Generate()
 	if err != nil {

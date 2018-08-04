@@ -4,8 +4,8 @@ package config
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"fmt"
+	"io/ioutil"
 )
 
 type BlogInformation interface {

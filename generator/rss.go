@@ -11,30 +11,25 @@ import (
 
 // rssGenerator object
 type rssGenerator struct {
-	config *rssConfig
-}
-
-// rssConfig holds the configuration for an RSS feed
-type rssConfig struct {
 	posts       []*post
 	destination string
 	siteInfo    *config.SiteInformation
 }
 
-const rssDateFormat string = "02 Jan 2006 15:04 -0700"
+const rssDateFormat = "02 Jan 2006 15:04 -0700"
 
 // Generate creates an RSS feed
 func (g *rssGenerator) Generate() (err error) {
 	fmt.Println("\tGenerating RSS...")
-	posts := g.config.posts
-	destination := g.config.destination
+	posts := g.posts
+	destination := g.destination
 	doc := etree.NewDocument()
 	doc.CreateProcInst("xml", `version="1.0" encoding="UTF-8"`)
 	rss := doc.CreateElement("rss")
 	rss.CreateAttr("xmlns:atom", "http://www.w3.org/2005/Atom")
 	rss.CreateAttr("version", "2.0")
 	channel := rss.CreateElement("channel")
-	siteInfo := g.config.siteInfo
+	siteInfo := g.siteInfo
 
 	channel.CreateElement("title").SetText(siteInfo.BlogTitle)
 	channel.CreateElement("link").SetText(siteInfo.BlogURL)
@@ -48,7 +43,7 @@ func (g *rssGenerator) Generate() (err error) {
 	atomLink.CreateAttr("type", "application/rss+xml")
 
 	for _, post := range posts {
-		err := addItem(channel, post, fmt.Sprintf("%s/%s/", siteInfo.BlogURL, post.name[1:]), siteInfo.DateFormat)
+		err := g.addItem(channel, post)
 		if err != nil {
 			return err
 		}
@@ -68,13 +63,14 @@ func (g *rssGenerator) Generate() (err error) {
 	return nil
 }
 
-func addItem(element *etree.Element, post *post, path, dateFormat string) (err error) {
+func (g *rssGenerator) addItem(element *etree.Element, post *post) (err error) {
+	path := fmt.Sprintf("%s/%s/", g.siteInfo.BlogURL, post.name[1:])
 	meta := post.meta
 	item := element.CreateElement("item")
 	item.CreateElement("title").SetText(meta.Title)
 	item.CreateElement("link").SetText(path)
 	item.CreateElement("guid").SetText(path)
-	pubDate, err := time.Parse(dateFormat, meta.Date)
+	pubDate, err := time.Parse(g.siteInfo.DateFormat, meta.Date)
 	if err != nil {
 		return fmt.Errorf("error parsing date %s: %v", meta.Date, err)
 	}

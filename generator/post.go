@@ -7,13 +7,9 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
-	"time"
-
 	"github.com/PuerkitoBio/goquery"
 	"github.com/russross/blackfriday"
 	"github.com/sourcegraph/syntaxhighlight"
-	"gopkg.in/yaml.v2"
-
 	"github.com/RomanosTrechlis/blog-generator/config"
 	"github.com/RomanosTrechlis/blog-generator/util/fs"
 )
@@ -32,51 +28,34 @@ type byDateDesc []*post
 
 // postGenerator object
 type postGenerator struct {
-	config *postConfig
-}
-
-// postConfig holds the post's configuration
-type postConfig struct {
 	post        *post
 	siteInfo    *config.SiteInformation
 	template    *template.Template
 	destination string
 }
 
-func newPostConfig(post *post, destination string, template *template.Template, siteInfo *config.SiteInformation) *postConfig {
-	return &postConfig{
-		post:        post,
-		destination: destination,
-		template:    template,
-		siteInfo:    siteInfo,
-	}
-}
-
 // Generate generates a post
 func (g *postGenerator) Generate() (err error) {
-	post := g.config.post
-	siteInfo := g.config.siteInfo
-	destination := g.config.destination
-	t := g.config.template
+	post := g.post
 	fmt.Printf("\tGenerating Post: %s...\n", post.meta.Title)
-	staticPath := fmt.Sprintf("%s%s", destination, post.name)
+	staticPath := fmt.Sprintf("%s%s", g.destination, post.name)
 	err = os.Mkdir(staticPath, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("error creating directory at %s: %v", staticPath, err)
 	}
 	if post.imagesDir != "" {
-		err := copyImagesDir(post.imagesDir, staticPath)
+		err := g.copyImagesDir(post.imagesDir, staticPath)
 		if err != nil {
 			return err
 		}
 	}
 
-	err = writeIndexHTMLPost(staticPath, post.meta.Title, template.HTML(string(post.html)), t, siteInfo, true)
+	err = writeIndexHTMLPost(staticPath, post.meta.Title, template.HTML(string(post.html)), g.template, g.siteInfo, true)
 	if err != nil {
 		return err
 	}
 
-	err = copyAdditionalArtifacts(staticPath, post.name, siteInfo.TempFolder)
+	err = g.copyAdditionalArtifacts(staticPath, post.name)
 	if err != nil {
 		return err
 	}
@@ -84,31 +63,14 @@ func (g *postGenerator) Generate() (err error) {
 	return nil
 }
 
-func newPost(path, dateFormat string) (p *post, err error) {
-	meta, err := getMeta(path, dateFormat)
-	if err != nil {
-		return nil, err
-	}
-	html, err := getHTML(path)
-	if err != nil {
-		return nil, err
-	}
-	imagesDir, images, err := getImages(path)
-	if err != nil {
-		return nil, err
-	}
-	name := path[strings.LastIndex(path, "/"):]
-	p = &post{name: name, meta: meta, html: html, imagesDir: imagesDir, images: images}
-	return p, nil
-}
-
-func copyDir(source, path string) (err error) {
-	files, err := ioutil.ReadDir(source)
+func (g *postGenerator) copyAdditionalArtifacts(path, postName string) (err error) {
+	src := g.siteInfo.TempFolder + postName + "/artifacts/"
+	files, err := ioutil.ReadDir(src)
 	if err != nil {
 		return nil
 	}
 	for _, file := range files {
-		src := fmt.Sprintf("%s/%s", source, file.Name())
+		src := fmt.Sprintf("%s/%s", src, file.Name())
 		dst := fmt.Sprintf("%s/%s", path, file.Name())
 		err := fs.CopyFile(src, dst)
 		if err != nil {
@@ -118,7 +80,7 @@ func copyDir(source, path string) (err error) {
 	return nil
 }
 
-func copyImagesDir(source, destination string) (err error) {
+func (*postGenerator) copyImagesDir(source, destination string) (err error) {
 	path := fmt.Sprintf("%s/images", destination)
 	err = os.Mkdir(path, os.ModePerm)
 	if err != nil {
@@ -139,25 +101,6 @@ func copyImagesDir(source, destination string) (err error) {
 	return nil
 }
 
-func getMeta(path, dateFormat string) (metaP *Meta, err error) {
-	filePath := fmt.Sprintf("%s/meta.yml", path)
-	metaraw, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		return nil, fmt.Errorf("error while reading file %s: %v", filePath, err)
-	}
-	meta := Meta{}
-	err = yaml.Unmarshal(metaraw, &meta)
-	if err != nil {
-		return nil, fmt.Errorf("error reading yml in %s: %v", filePath, err)
-	}
-	parsedDate, err := time.Parse(dateFormat, meta.Date)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing date in %s: %v", filePath, err)
-	}
-	meta.ParsedDate = parsedDate
-	return &meta, nil
-}
-
 func getHTML(path string) (html []byte, err error) {
 	filePath := fmt.Sprintf("%s/post.md", path)
 	input, err := ioutil.ReadFile(filePath)
@@ -171,7 +114,6 @@ func getHTML(path string) (html []byte, err error) {
 	}
 	html = []byte(replaced)
 	return html, nil
-
 }
 
 func getImages(path string) (dirPath string, images []string, err error) {

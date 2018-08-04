@@ -20,49 +20,24 @@ type ListingData struct {
 	Tags       []Tag
 }
 
-// listingGenerator Object
+// listingGenerator struct
 type listingGenerator struct {
-	config *listingConfig
-}
-
-// listingConfig holds the configuration for the listing page
-type listingConfig struct {
 	posts                  []*post
 	template               *template.Template
 	siteInfo               *config.SiteInformation
 	destination, pageTitle string
-	pageNum                int
-	maxPageNum             int
+	pageNum, maxPageNum    int
 }
-
-func newListingConfig(posts []*post, template *template.Template, siteInfo *config.SiteInformation,
-	destination, pageTitle string, pageNum, maxPageNum int) *listingConfig {
-	return &listingConfig{
-		posts:       posts,
-		template:    template,
-		destination: destination,
-		pageTitle:   pageTitle,
-		pageNum:     pageNum,
-		maxPageNum:  maxPageNum,
-		siteInfo:    siteInfo,
-	}
-}
-
-var shortTemplatePath string
 
 // Generate starts the listing generation
 func (g *listingGenerator) Generate() (err error) {
-	shortTemplatePath = g.config.siteInfo.ThemeFolder + "short.html"
-	posts := g.config.posts
-	t := g.config.template
-	destination := g.config.destination
-	pageTitle := g.config.pageTitle
+	shortTemplatePath := g.siteInfo.ThemeFolder + "short.html"
 	short, err := getTemplate(shortTemplatePath)
 	if err != nil {
 		return err
 	}
 	var postBlocks []string
-	for _, post := range posts {
+	for _, post := range g.posts {
 		meta := post.meta
 		link := fmt.Sprintf("%s/", post.name)
 		ld := ListingData{
@@ -81,13 +56,13 @@ func (g *listingGenerator) Generate() (err error) {
 		postBlocks = append(postBlocks, block.String())
 	}
 	htmlBlocks := template.HTML(strings.Join(postBlocks, "<br />"))
-	if g.config.pageNum > 1 {
-		err := os.Mkdir(destination, os.ModePerm)
+	if g.pageNum > 1 {
+		err := os.Mkdir(g.destination, os.ModePerm)
 		if err != nil {
-			return fmt.Errorf("error creating directory at %s: %v", destination, err)
+			return fmt.Errorf("error creating directory at %s: %v", g.destination, err)
 		}
 	}
-	err = writeIndexHTMLPlus(destination, pageTitle, htmlBlocks, t, g.config.siteInfo, false, g.config.pageNum, g.config.maxPageNum)
+	err = writeIndexHTMLPlus(g.destination, g.pageTitle, htmlBlocks, g.template, g.siteInfo, false, g.pageNum, g.maxPageNum)
 	if err != nil {
 		return err
 	}

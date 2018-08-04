@@ -1,10 +1,11 @@
 package main
 
 import (
-	"os"
-	"github.com/RomanosTrechlis/go-icls/cli"
-	"github.com/RomanosTrechlis/blog-generator/config"
 	"fmt"
+	"os"
+
+	"github.com/RomanosTrechlis/blog-generator/config"
+	"github.com/RomanosTrechlis/go-icls/cli"
 )
 
 func createCommandTree(siteInfo config.SiteInformation) *cli.CLI {
@@ -13,9 +14,9 @@ func createCommandTree(siteInfo config.SiteInformation) *cli.CLI {
 	c.New("theme", getThemeShortHelp, getThemeLongHelp, getThemeHandler(siteInfo))
 	c.New("generate", generateShortHelp, generateLongHelp, getGenerateHandler(siteInfo))
 	c.New("example", jsonExampleShortHelp, jsonExampleLongHelp, getExampleConfigHandler(siteInfo))
-	server := c.New("server", jsonExampleShortHelp, jsonExampleLongHelp, getServerHandler(c, siteInfo))
+	server := c.New("server", runShortHelp, runLongHelp, getServerHandler(c, siteInfo))
 	server.IntFlag("p", "port", 8080, "port for web server", false)
-	all := c.New("all", jsonExampleShortHelp, jsonExampleLongHelp, getExecAllHandler(c, siteInfo))
+	all := c.New("all", execAllShortHelp, execAllLongHelp, getExecAllHandler(c, siteInfo))
 	all.IntFlag("p", "port", 8080, "port for web server", false)
 	return c
 }
@@ -31,7 +32,7 @@ func main() {
 
 	c := createCommandTree(siteInfo)
 
-	if len(args) == 0{
+	if len(args) == 0 {
 		args = append(args, "-h")
 	}
 

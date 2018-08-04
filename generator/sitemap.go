@@ -9,11 +9,6 @@ import (
 
 // sitemapGenerator object
 type sitemapGenerator struct {
-	config *sitemapConfig
-}
-
-// sitemapConfig holds the config for the sitemap
-type sitemapConfig struct {
 	posts            []*post
 	tagPostsMap      map[string][]*post
 	categoryPostsMap map[string][]*post
@@ -24,10 +19,6 @@ type sitemapConfig struct {
 // Generate creates the sitemap
 func (g *sitemapGenerator) Generate() (err error) {
 	fmt.Println("\tGenerating Sitemap...")
-	posts := g.config.posts
-	tagPostsMap := g.config.tagPostsMap
-	catPostsMap := g.config.categoryPostsMap
-	destination := g.config.destination
 	doc := etree.NewDocument()
 	doc.CreateProcInst("xml", `version="1.0" encoding="UTF-8"`)
 	urlSet := doc.CreateElement("urlset")
@@ -36,26 +27,26 @@ func (g *sitemapGenerator) Generate() (err error) {
 
 	url := urlSet.CreateElement("url")
 	loc := url.CreateElement("loc")
-	loc.SetText(g.config.blogURL)
+	loc.SetText(g.blogURL)
 
-	addURL(urlSet, "about", g.config.blogURL, nil)
-	addURL(urlSet, "archive", g.config.blogURL, nil)
-	addURL(urlSet, "tags", g.config.blogURL, nil)
-	addURL(urlSet, "categories", g.config.blogURL, nil)
+	g.addURL(urlSet, "about", nil)
+	g.addURL(urlSet, "archive", nil)
+	g.addURL(urlSet, "tags", nil)
+	g.addURL(urlSet, "categories", nil)
 
-	for tag := range tagPostsMap {
-		addURL(urlSet, tag, g.config.blogURL, nil)
+	for tag := range g.tagPostsMap {
+		g.addURL(urlSet, tag, nil)
 	}
 
-	for cat := range catPostsMap {
-		addURL(urlSet, cat, g.config.blogURL, nil)
+	for cat := range g.categoryPostsMap {
+		g.addURL(urlSet, cat, nil)
 	}
 
-	for _, post := range posts {
-		addURL(urlSet, post.name[1:], g.config.blogURL, post.images)
+	for _, post := range g.posts {
+		g.addURL(urlSet, post.name[1:], post.images)
 	}
 
-	filePath := fmt.Sprintf("%s/sitemap.xml", destination)
+	filePath := fmt.Sprintf("%s/sitemap.xml", g.destination)
 	f, err := os.Create(filePath)
 	if err != nil {
 		return fmt.Errorf("error creating file %s: %v", filePath, err)
@@ -69,16 +60,16 @@ func (g *sitemapGenerator) Generate() (err error) {
 	return nil
 }
 
-func addURL(element *etree.Element, location, blogUrl string, images []string) {
+func (g *sitemapGenerator) addURL(element *etree.Element, location string, images []string) {
 	url := element.CreateElement("url")
 	loc := url.CreateElement("loc")
-	loc.SetText(fmt.Sprintf("%s/%s/", blogUrl, location))
+	loc.SetText(fmt.Sprintf("%s/%s/", g.blogURL, location))
 
 	if len(images) > 0 {
 		for _, image := range images {
 			img := url.CreateElement("image:image")
 			imgLoc := img.CreateElement("image:loc")
-			imgLoc.SetText(fmt.Sprintf("%s/%s/images/%s", blogUrl, location, image))
+			imgLoc.SetText(fmt.Sprintf("%s/%s/images/%s", g.blogURL, location, image))
 		}
 	}
 }

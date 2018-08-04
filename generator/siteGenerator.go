@@ -13,54 +13,54 @@ import (
 	"time"
 
 	"github.com/RomanosTrechlis/blog-generator/config"
+	"io/ioutil"
+	"gopkg.in/yaml.v2"
 )
 
 // siteGenerator object
 type siteGenerator struct {
-	config *SiteConfig
-}
-
-// SiteConfig holds the sources and destination folder
-type SiteConfig struct {
 	Sources  []string
 	SiteInfo *config.SiteInformation
 }
 
 // New creates a new SiteGenerator
-func NewSiteGenerator(config *SiteConfig) *siteGenerator {
-	return &siteGenerator{config: config}
+func NewSiteGenerator(sources []string, siteInfo *config.SiteInformation) *siteGenerator {
+	return &siteGenerator{sources, siteInfo}
 }
 
 var templatePath string
 
 // Generate starts the static blog generation
 func (g *siteGenerator) Generate() (err error) {
-	templatePath = g.config.SiteInfo.ThemeFolder + "template.html"
+	templatePath = g.SiteInfo.ThemeFolder + "template.html"
 	fmt.Println("Generating Site...")
-	sources := g.config.Sources
-	destination := g.config.SiteInfo.DestFolder
-	err = clearAndCreateDestination(destination)
+	err = clearAndCreateDestination(g.SiteInfo.DestFolder)
 	if err != nil {
 		return err
 	}
-	err = clearAndCreateDestination(fmt.Sprintf("%s/archive", destination))
+
+	err = clearAndCreateDestination(fmt.Sprintf("%s/archive", g.SiteInfo.DestFolder))
 	if err != nil {
 		return err
 	}
+
 	t, err := getTemplate(templatePath)
 	if err != nil {
 		return err
 	}
-	var posts []*post
-	for _, path := range sources {
-		post, err := newPost(path, g.config.SiteInfo.DateFormat)
+
+	posts := make([]*post, 0)
+	for _, path := range g.Sources {
+		post, err := g.newPost(path)
 		if err != nil {
 			return err
 		}
 		posts = append(posts, post)
 	}
 	sort.Sort(byDateDesc(posts))
-	err = runTasks(posts, t, g.config.SiteInfo)
+
+	generators := g.createTasks(posts, t)
+	err = g.runTasks(generators)
 	if err != nil {
 		return err
 	}
@@ -68,23 +68,56 @@ func (g *siteGenerator) Generate() (err error) {
 	return nil
 }
 
-func runTasks(posts []*post, t *template.Template, siteInfo *config.SiteInformation) (err error) {
-	var wg sync.WaitGroup
-	finished := make(chan bool, 1)
-	errors := make(chan error, 1)
-	pool := make(chan struct{}, 50)
-	generators := []Generator{}
-	destination := siteInfo.DestFolder
+func (g *siteGenerator) newPost(path string) (p *post, err error) {
+	meta, err := g.getPostMeta(path)
+	if err != nil {
+		return nil, err
+	}
+	html, err := getHTML(path)
+	if err != nil {
+		return nil, err
+	}
+	imagesDir, images, err := getImages(path)
+	if err != nil {
+		return nil, err
+	}
+	name := path[strings.LastIndex(path, "/"):]
+	p = &post{name: name, meta: meta, html: html, imagesDir: imagesDir, images: images}
+	return p, nil
+}
+
+func (g *siteGenerator) getPostMeta(path string) (*Meta, error) {
+	filePath := fmt.Sprintf("%s/meta.yml", path)
+	metaraw, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("error while reading file %s: %v", filePath, err)
+	}
+	meta := Meta{}
+	err = yaml.Unmarshal(metaraw, &meta)
+	if err != nil {
+		return nil, fmt.Errorf("error reading yml in %s: %v", filePath, err)
+	}
+	parsedDate, err := time.Parse(g.SiteInfo.DateFormat, meta.Date)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing date in %s: %v", filePath, err)
+	}
+	meta.ParsedDate = parsedDate
+	return &meta, nil
+}
+
+func (g *siteGenerator) createTasks(posts []*post, t *template.Template) []Generator {
+	generators := make([]Generator, 0)
+	destination := g.SiteInfo.DestFolder
 
 	//posts
 	for _, post := range posts {
-		pg := postGenerator{newPostConfig(post, destination, t, siteInfo)}
+		pg := postGenerator{post, g.SiteInfo, t, destination}
 		generators = append(generators, &pg)
 	}
 	tagPostsMap := createTagPostsMap(posts)
 
 	// frontpage
-	paging := siteInfo.NumPostsFrontPage
+	paging := g.SiteInfo.NumPostsFrontPage
 	numOfPages := getNumberOfPages(posts, paging)
 	for i := 0; i < numOfPages; i++ {
 		to := destination
@@ -95,57 +128,65 @@ func runTasks(posts []*post, t *template.Template, siteInfo *config.SiteInformat
 		if (i + 1) == numOfPages {
 			toP = len(posts)
 		}
-		generators = append(generators, &listingGenerator{newListingConfig(posts[i*paging : toP], t, siteInfo, to, "", i + 1, numOfPages)})
+		lg := &listingGenerator{posts[i*paging:toP], t, g.SiteInfo, to, "", i+1, numOfPages}
+		generators = append(generators, lg)
 	}
 
 	// archive
-	ag := listingGenerator{newListingConfig(posts, t, siteInfo, fmt.Sprintf("%s/archive", destination), "Archive", 0, 0)}
+	ag := listingGenerator{posts, t, g.SiteInfo, fmt.Sprintf("%s/archive", destination), "Archive", 0, 0}
 	// tags
-	tg := tagsGenerator{&tagsConfig{
+	tg := tagsGenerator{
 		tagPostsMap: tagPostsMap,
 		template:    t,
-		siteInfo:    siteInfo,
-	}}
+		siteInfo:    g.SiteInfo,
+	}
 	// categories
 	catPostsMap := createCatPostsMap(posts)
-	ct := categoriesGenerator{&categoriesConfig{
+	ct := categoriesGenerator{
 		catPostsMap: catPostsMap,
 		template:    t,
 		destination: destination,
-		siteInfo:    siteInfo,
-	}}
-
+		siteInfo:    g.SiteInfo,
+	}
 	// sitemap
-	sg := sitemapGenerator{&sitemapConfig{
+	sg := sitemapGenerator{
 		posts:            posts,
 		tagPostsMap:      tagPostsMap,
 		categoryPostsMap: catPostsMap,
 		destination:      destination,
-		blogURL:          siteInfo.BlogURL,
-	}}
+		blogURL:          g.SiteInfo.BlogURL,
+	}
 	// rss
-	rg := rssGenerator{&rssConfig{
+	rg := rssGenerator{
 		posts:       posts,
 		destination: destination,
-		siteInfo:    siteInfo,
-	}}
+		siteInfo:    g.SiteInfo,
+	}
 	// statics
 	fileToDestination := make(map[string]string)
 	templateToFile := make(map[string]string)
-	for _, row := range siteInfo.StaticPages {
+	for _, row := range g.SiteInfo.StaticPages {
 		if row.IsTemplate {
-			templateToFile[siteInfo.ThemeFolder+row.File] = fmt.Sprintf("%s/%s", destination, row.To)
+			templateToFile[g.SiteInfo.ThemeFolder+row.File] = fmt.Sprintf("%s/%s", destination, row.To)
 			continue
 		}
-		fileToDestination[siteInfo.ThemeFolder+row.File] = fmt.Sprintf("%s/%s", destination, row.To)
+		fileToDestination[g.SiteInfo.ThemeFolder+row.File] = fmt.Sprintf("%s/%s", destination, row.To)
 	}
-	statg := staticsGenerator{&staticsConfig{
+	statg := staticsGenerator{
 		fileToDestination: fileToDestination,
 		templateToFile:    templateToFile,
 		template:          t,
-		siteInfo:          siteInfo,
-	}}
+		siteInfo:          g.SiteInfo,
+	}
 	generators = append(generators, &ag, &tg, &ct, &sg, &rg, &statg)
+	return generators
+}
+
+func (g *siteGenerator) runTasks(generators []Generator) (err error) {
+	var wg sync.WaitGroup
+	finished := make(chan bool, 1)
+	errors := make(chan error, 1)
+	pool := make(chan struct{}, 50)
 
 	for _, generator := range generators {
 		wg.Add(1)
@@ -223,11 +264,6 @@ func writeIndexHTMLPlus(path, pageTitle string, content template.HTML, t *templa
 		return fmt.Errorf("error writing file %s: %v", filePath, err)
 	}
 	return nil
-}
-
-func copyAdditionalArtifacts(path, postName, tempFolder string) (err error) {
-	src := tempFolder + postName + "/artifacts/"
-	return copyDir(src, path)
 }
 
 func getHTMLTitle(pageTitle, blogTitle string) (title string) {
