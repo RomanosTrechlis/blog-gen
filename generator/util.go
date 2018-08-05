@@ -10,7 +10,7 @@ import (
 )
 
 func clearAndCreateDestination(path string) (err error) {
-	err = os.RemoveAll(path)
+	err = fs.ClearFolder(path)
 	if err != nil {
 		if !os.IsNotExist(err) {
 			return fmt.Errorf("error removing folder at destination %s: %v ", path, err)

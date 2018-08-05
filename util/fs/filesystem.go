@@ -120,18 +120,18 @@ func CreateFolderIfNotExist(path string) (err error) {
 func ClearFolder(path string) (err error) {
 	dir, err := os.Open(path)
 	if err != nil {
-		return fmt.Errorf("error accessing directory %s: %v", path, err)
+		return err
 	}
 	defer dir.Close()
 	names, err := dir.Readdirnames(-1)
 	if err != nil {
-		return fmt.Errorf("error reading directory %s: %v", path, err)
+		return err
 	}
 
 	for _, name := range names {
 		err = os.RemoveAll(filepath.Join(path, name))
 		if err != nil {
-			return fmt.Errorf("error clearing file %s: %v", name, err)
+			return err
 		}
 	}
 	return nil
