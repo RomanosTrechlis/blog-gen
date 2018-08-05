@@ -8,9 +8,6 @@ import (
 	"io/ioutil"
 )
 
-type BlogInformation interface {
-}
-
 // SiteInformation contains the information inside ConfigFile
 type SiteInformation struct {
 	Author            string `json:"Author"`
@@ -75,7 +72,7 @@ func (si *SiteInformation) fillDefaultValues() {
 		si.DestFolder = "./public"
 	}
 	if si.ThemeFolder == "" {
-		si.DestFolder = "./static"
+		si.ThemeFolder = "./static/"
 	}
 	if si.NumPostsFrontPage == 0 {
 		si.NumPostsFrontPage = 10
