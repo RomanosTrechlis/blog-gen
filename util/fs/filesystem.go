@@ -138,7 +138,7 @@ func ClearFolder(path string) (err error) {
 }
 
 func GetFolderNameFrom(path string) string {
-	separator := getSeparator()
+	separator := GetSeparator()
 
 	i := strings.LastIndex(path, separator) + 1
 	if i >= len(path) {
@@ -153,7 +153,7 @@ func GetFolderNameFrom(path string) string {
 }
 
 func GetFilenameFrom(path string) string {
-	separator := getSeparator()
+	separator := GetSeparator()
 	i := strings.LastIndex(path, separator) + 1
 	if i >= len(path) {
 		return ""
@@ -165,7 +165,7 @@ func GetFilenameFrom(path string) string {
 	return f
 }
 
-func getSeparator() string {
+func GetSeparator() string {
 	separator := "/"
 	osWin := runtime.GOOS == "windows"
 	if osWin {

@@ -16,6 +16,8 @@ import (
 
 	"github.com/RomanosTrechlis/blog-gen/config"
 	"gopkg.in/yaml.v2"
+	"github.com/RomanosTrechlis/blog-gen/util/fs"
+	"github.com/RomanosTrechlis/blog-gen/util/url"
 )
 
 // siteGenerator object
@@ -33,14 +35,14 @@ var templatePath string
 
 // Generate starts the static blog generation
 func (g *siteGenerator) Generate() (err error) {
-	templatePath = g.SiteInfo.ThemeFolder + "template.html"
+	templatePath = filepath.Join(g.SiteInfo.ThemeFolder, "template.html")
 	fmt.Println("Generating Site...")
 	err = clearAndCreateDestination(g.SiteInfo.DestFolder)
 	if err != nil {
 		return err
 	}
 
-	err = clearAndCreateDestination(fmt.Sprintf("%s/archive", g.SiteInfo.DestFolder))
+	err = clearAndCreateDestination(filepath.Join(g.SiteInfo.DestFolder, "archive"))
 	if err != nil {
 		return err
 	}
@@ -82,7 +84,7 @@ func (g *siteGenerator) newPost(path string) (p *post, err error) {
 	if err != nil {
 		return nil, err
 	}
-	name := path[strings.LastIndex(path, string(filepath.Separator)):]
+	name := path[strings.LastIndex(path, fs.GetSeparator()) + 1:]
 	p = &post{name: name, meta: meta, html: html, imagesDir: imagesDir, images: images}
 	return p, nil
 }
@@ -168,10 +170,10 @@ func (g *siteGenerator) createTasks(posts []*post, t *template.Template) []Gener
 	templateToFile := make(map[string]string)
 	for _, row := range g.SiteInfo.StaticPages {
 		if row.IsTemplate {
-			templateToFile[g.SiteInfo.ThemeFolder+row.File] = fmt.Sprintf("%s/%s", destination, row.To)
+			templateToFile[g.SiteInfo.ThemeFolder+row.File] = filepath.Join(destination, row.To)
 			continue
 		}
-		fileToDestination[g.SiteInfo.ThemeFolder+row.File] = fmt.Sprintf("%s/%s", destination, row.To)
+		fileToDestination[g.SiteInfo.ThemeFolder+row.File] = filepath.Join(destination, row.To)
 	}
 	statg := staticsGenerator{
 		fileToDestination: fileToDestination,
@@ -243,17 +245,19 @@ func (h htmlConfig) writeHTML() error {
 	if h.pageNum == h.maxPageNum {
 		next = 0
 	}
+
+	u := url.ChangePathToUrl(h.path)
 	td := IndexData{
 		Name:          h.siteInfo.Author,
 		Year:          time.Now().Year(),
 		HTMLTitle:     getHTMLTitle(h.pageTitle, h.siteInfo.BlogTitle),
 		PageTitle:     h.pageTitle,
 		Content:       h.content,
-		CanonicalLink: buildCanonicalLink(h.path, h.siteInfo.BlogURL),
+		CanonicalLink: buildCanonicalLink(u, h.siteInfo.BlogURL),
 		PageNum:       h.pageNum,
 		NextPageNum:   next,
 		PrevPageNum:   prev,
-		URL:           buildCanonicalLink(h.path, h.siteInfo.BlogURL),
+		URL:           buildCanonicalLink(u, h.siteInfo.BlogURL),
 		IsPost:        h.isPost,
 	}
 

@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
-	"os"
 	"strings"
 
 	"github.com/RomanosTrechlis/blog-gen/config"
 	"github.com/RomanosTrechlis/blog-gen/util/fs"
+	"github.com/RomanosTrechlis/blog-gen/util/url"
 )
 
 // staticsGenerator object
@@ -66,7 +66,7 @@ func (g *staticsGenerator) resolveTemplateToFile() error {
 	for k, v := range g.templateToFile {
 		folder := fs.GetFolderNameFrom(v)
 		if folder != "" {
-			err := fs.CreateFolderIfNotExist(fs.GetFolderNameFrom(v))
+			err := fs.CreateFolderIfNotExist(folder)
 			if err != nil {
 				return err
 			}
@@ -78,7 +78,7 @@ func (g *staticsGenerator) resolveTemplateToFile() error {
 		}
 
 		c := htmlConfig{
-			path:       fs.GetFolderNameFrom(v),
+			path:       url.ChangePathToUrl(folder),
 			pageTitle:  getTitle(k),
 			pageNum:    0,
 			maxPageNum: 0,
@@ -90,21 +90,6 @@ func (g *staticsGenerator) resolveTemplateToFile() error {
 		err = c.writeHTML()
 		if err != nil {
 			return err
-		}
-	}
-	return nil
-}
-
-func createFolderIfNotExist(path string) (err error) {
-	_, err = os.Stat(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			err = os.Mkdir(path, os.ModePerm)
-			if err != nil {
-				return fmt.Errorf("error creating directory %s: %v", path, err)
-			}
-		} else {
-			return fmt.Errorf("error accessing directory %s: %v", path, err)
 		}
 	}
 	return nil

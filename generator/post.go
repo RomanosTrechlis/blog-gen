@@ -12,6 +12,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/RomanosTrechlis/blog-gen/config"
 	"github.com/RomanosTrechlis/blog-gen/util/fs"
+	"github.com/RomanosTrechlis/blog-gen/util/url"
 	"github.com/russross/blackfriday"
 	"github.com/sourcegraph/syntaxhighlight"
 )
@@ -40,8 +41,8 @@ type postGenerator struct {
 func (g *postGenerator) Generate() (err error) {
 	post := g.post
 	fmt.Printf("\tGenerating Post: %s...\n", post.meta.Title)
-	staticPath := fmt.Sprintf("%s%s", g.destination, post.name)
-	err = os.Mkdir(staticPath, os.ModePerm)
+	staticPath := filepath.Join(g.destination, post.name)
+	err = fs.CreateFolderIfNotExist(staticPath)
 	if err != nil {
 		return fmt.Errorf("error creating directory at %s: %v", staticPath, err)
 	}
@@ -53,7 +54,7 @@ func (g *postGenerator) Generate() (err error) {
 	}
 
 	c := htmlConfig{
-		path:       staticPath,
+		path:       url.ChangePathToUrl(staticPath),
 		pageTitle:  post.meta.Title,
 		pageNum:    0,
 		maxPageNum: 0,
