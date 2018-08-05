@@ -82,7 +82,7 @@ func TestGetFilenameFrom(t *testing.T) {
 			result string
 		}{
 			{"folder/file.txt", "file.txt"},
-			{"folder\\file.txt", "folder/file.txt"}, // shouldn't be like that but it's ok for now
+			{"folder\\file.txt", "folder\\file.txt"}, // shouldn't be like that but it's ok for now
 			{"folder/folder/file.txt", "file.txt"},
 			{"file.txt", "file.txt"},
 			{"/file.txt", "file.txt"},
@@ -115,7 +115,7 @@ func TestGetFolderNameFrom(t *testing.T) {
 		}{
 			{"folder/file.txt", "folder"},
 			{"folder\\file.txt", ""},
-			{"folder/folder/file.txt", "folder\\folder"},
+			{"folder/folder/file.txt", "folder/folder"},
 			{"file.txt", ""},
 			{"/file.txt", ""},
 		}
