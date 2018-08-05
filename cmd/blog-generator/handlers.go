@@ -51,7 +51,10 @@ func getGenerateHandler(siteInfo config.SiteInformation) func(flags map[string]s
 		g := generator.NewSiteGenerator(dirs, &siteInfo)
 
 		err = g.Generate()
-		return fmt.Errorf("failed to generate blog: %v", err)
+		if err !=  nil {
+			return fmt.Errorf("failed to generate blog: %v", err)
+		}
+		return nil
 	}
 }
 

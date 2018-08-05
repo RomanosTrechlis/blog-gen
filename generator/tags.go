@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
+	"path/filepath"
 	"sort"
 
 	"github.com/RomanosTrechlis/blog-gen/config"
@@ -52,8 +53,8 @@ func (g *tagsGenerator) Generate() (err error) {
 }
 
 func (g *tagsGenerator) generateTagIndex() (err error) {
-	tagsPath := fmt.Sprintf("%s/tags", g.siteInfo.DestFolder)
-	tagsTemplatePath := g.siteInfo.ThemeFolder + "tags.html"
+	tagsPath := filepath.Join(g.siteInfo.DestFolder, "tags")
+	tagsTemplatePath := filepath.Join(g.siteInfo.ThemeFolder, "tags.html")
 	tmpl, err := getTemplate(tagsTemplatePath)
 	if err != nil {
 		return err

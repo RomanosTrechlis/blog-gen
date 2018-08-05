@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/RomanosTrechlis/blog-gen/config"
@@ -31,7 +32,7 @@ type listingGenerator struct {
 
 // Generate starts the listing generation
 func (g *listingGenerator) Generate() (err error) {
-	shortTemplatePath := g.siteInfo.ThemeFolder + "short.html"
+	shortTemplatePath := filepath.Join(g.siteInfo.ThemeFolder, "short.html")
 	short, err := getTemplate(shortTemplatePath)
 	if err != nil {
 		return err

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -30,7 +31,7 @@ func (g *categoriesGenerator) Generate() (err error) {
 	fmt.Println("\tGenerating Categories...")
 	catPostsMap := g.catPostsMap
 	destination := g.destination
-	catsPath := fmt.Sprintf("%s/categories", destination)
+	catsPath := filepath.Join(destination, "categories")
 	err = clearAndCreateDestination(catsPath)
 	if err != nil {
 		return err
@@ -40,7 +41,7 @@ func (g *categoriesGenerator) Generate() (err error) {
 		return err
 	}
 	for cat, catPosts := range catPostsMap {
-		catPagePath := fmt.Sprintf("%s/%s", catsPath, cat)
+		catPagePath := filepath.Join(catsPath, cat)
 		err = g.generateCatPage(cat, catPosts, catPagePath)
 		if err != nil {
 			return err
@@ -51,7 +52,7 @@ func (g *categoriesGenerator) Generate() (err error) {
 }
 
 func (g *categoriesGenerator) generateCatIndex() (err error) {
-	catTemplatePath := g.siteInfo.ThemeFolder + "categories.html"
+	catTemplatePath := filepath.Join(g.siteInfo.ThemeFolder, "categories.html")
 	tmpl, err := getTemplate(catTemplatePath)
 	if err != nil {
 		return err

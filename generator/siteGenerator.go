@@ -15,9 +15,9 @@ import (
 	"time"
 
 	"github.com/RomanosTrechlis/blog-gen/config"
-	"gopkg.in/yaml.v2"
 	"github.com/RomanosTrechlis/blog-gen/util/fs"
 	"github.com/RomanosTrechlis/blog-gen/util/url"
+	"gopkg.in/yaml.v2"
 )
 
 // siteGenerator object
@@ -84,7 +84,7 @@ func (g *siteGenerator) newPost(path string) (p *post, err error) {
 	if err != nil {
 		return nil, err
 	}
-	name := path[strings.LastIndex(path, fs.GetSeparator()) + 1:]
+	name := path[strings.LastIndex(path, fs.GetSeparator())+1:]
 	p = &post{name: name, meta: meta, html: html, imagesDir: imagesDir, images: images}
 	return p, nil
 }
@@ -170,10 +170,10 @@ func (g *siteGenerator) createTasks(posts []*post, t *template.Template) []Gener
 	templateToFile := make(map[string]string)
 	for _, row := range g.SiteInfo.StaticPages {
 		if row.IsTemplate {
-			templateToFile[g.SiteInfo.ThemeFolder+row.File] = filepath.Join(destination, row.To)
+			templateToFile[filepath.Join(g.SiteInfo.ThemeFolder, row.File)] = filepath.Join(destination, row.To)
 			continue
 		}
-		fileToDestination[g.SiteInfo.ThemeFolder+row.File] = filepath.Join(destination, row.To)
+		fileToDestination[filepath.Join(g.SiteInfo.ThemeFolder, row.File)] = filepath.Join(destination, row.To)
 	}
 	statg := staticsGenerator{
 		fileToDestination: fileToDestination,
