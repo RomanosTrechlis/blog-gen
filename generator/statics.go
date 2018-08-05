@@ -43,11 +43,15 @@ func (g *staticsGenerator) resolveFileToDestination() error {
 	}
 
 	for k, v := range g.fileToDestination {
-		err := createFolderIfNotExist(getFolder(v))
-		if err != nil {
-			return err
+		folder := fs.GetFolderNameFrom(v)
+		if folder != "" {
+			err := fs.CreateFolderIfNotExist(folder)
+			if err != nil {
+				return err
+			}
 		}
-		err = fs.CopyFile(k, v)
+
+		err := fs.CopyFile(k, fs.GetFolderNameFrom(v))
 		if err != nil {
 			return err
 		}
@@ -60,17 +64,21 @@ func (g *staticsGenerator) resolveTemplateToFile() error {
 		return nil
 	}
 	for k, v := range g.templateToFile {
-		err := createFolderIfNotExist(getFolder(v))
-		if err != nil {
-			return err
+		folder := fs.GetFolderNameFrom(v)
+		if folder != "" {
+			err := fs.CreateFolderIfNotExist(fs.GetFolderNameFrom(v))
+			if err != nil {
+				return err
+			}
 		}
+
 		content, err := ioutil.ReadFile(k)
 		if err != nil {
 			return fmt.Errorf("error reading file %s: %v", k, err)
 		}
 
 		c := htmlConfig{
-			path:       getFolder(v),
+			path:       fs.GetFolderNameFrom(v),
 			pageTitle:  getTitle(k),
 			pageNum:    0,
 			maxPageNum: 0,

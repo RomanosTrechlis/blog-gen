@@ -37,7 +37,3 @@ func getTagLink(tag string) (link string) {
 	link = fmt.Sprintf("/tags/%s/", strings.ToLower(tag))
 	return link
 }
-
-func getFolder(path string) (folder string) {
-	return path[:strings.LastIndex(path, "/")]
-}

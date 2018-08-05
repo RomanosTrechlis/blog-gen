@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -75,15 +76,14 @@ func (g *postGenerator) Generate() (err error) {
 }
 
 func (g *postGenerator) copyAdditionalArtifacts(path, postName string) (err error) {
-	src := g.siteInfo.TempFolder + postName + "/artifacts/"
+	src := filepath.Join(g.siteInfo.TempFolder, postName, "artifacts")
 	files, err := ioutil.ReadDir(src)
 	if err != nil {
 		return nil
 	}
 	for _, file := range files {
-		src := fmt.Sprintf("%s/%s", src, file.Name())
-		dst := fmt.Sprintf("%s/%s", path, file.Name())
-		err := fs.CopyFile(src, dst)
+		src = filepath.Join(src, file.Name())
+		err := fs.CopyFile(src, path)
 		if err != nil {
 			return err
 		}
@@ -102,9 +102,8 @@ func (*postGenerator) copyImagesDir(source, destination string) (err error) {
 		return fmt.Errorf("error reading directory %s: %v", path, err)
 	}
 	for _, file := range files {
-		src := fmt.Sprintf("%s/%s", source, file.Name())
-		dst := fmt.Sprintf("%s/%s", path, file.Name())
-		err := fs.CopyFile(src, dst)
+		src := filepath.Join(source, file.Name())
+		err := fs.CopyFile(src, path)
 		if err != nil {
 			return err
 		}

@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"math"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -81,7 +82,7 @@ func (g *siteGenerator) newPost(path string) (p *post, err error) {
 	if err != nil {
 		return nil, err
 	}
-	name := path[strings.LastIndex(path, "/"):]
+	name := path[strings.LastIndex(path, string(filepath.Separator)):]
 	p = &post{name: name, meta: meta, html: html, imagesDir: imagesDir, images: images}
 	return p, nil
 }
@@ -230,7 +231,7 @@ type htmlConfig struct {
 }
 
 func (h htmlConfig) writeHTML() error {
-	filePath := fmt.Sprintf("%s/index.html", h.path)
+	filePath := filepath.Join(h.path, "index.html")
 	f, err := os.Create(filePath)
 	if err != nil {
 		return fmt.Errorf("error creating file %s: %v", filePath, err)

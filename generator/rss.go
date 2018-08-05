@@ -3,6 +3,7 @@ package generator
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/RomanosTrechlis/blog-gen/config"
@@ -49,7 +50,7 @@ func (g *rssGenerator) Generate() (err error) {
 		}
 	}
 
-	filePath := fmt.Sprintf("%s/index.xml", destination)
+	filePath := filepath.Join(destination, "index.xml")
 	f, err := os.Create(filePath)
 	if err != nil {
 		return fmt.Errorf("error creating file %s: %v", filePath, err)
