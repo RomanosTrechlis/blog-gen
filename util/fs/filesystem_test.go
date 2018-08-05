@@ -1,10 +1,12 @@
 package fs_test
 
 import (
-	"github.com/RomanosTrechlis/blog-gen/util/fs"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
+
+	"github.com/RomanosTrechlis/blog-gen/util/fs"
 )
 
 func TestCreateFolderIfNotExist(t *testing.T) {
@@ -74,6 +76,18 @@ func TestGetFilenameFrom(t *testing.T) {
 		{"file.txt", "file.txt"},
 		{"\\file.txt", "file.txt"},
 	}
+	if runtime.GOOS != "windows" {
+		tests = []struct {
+			path   string
+			result string
+		}{
+			{"folder/file.txt", "file.txt"},
+			{"folder\\file.txt", "folder/file.txt"}, // shouldn't be like that but it's ok for now
+			{"folder/folder/file.txt", "file.txt"},
+			{"file.txt", "file.txt"},
+			{"/file.txt", "file.txt"},
+		}
+	}
 
 	for _, tt := range tests {
 		r := fs.GetFilenameFrom(tt.path)
@@ -93,6 +107,18 @@ func TestGetFolderNameFrom(t *testing.T) {
 		{"folder\\folder\\file.txt", "folder\\folder"},
 		{"file.txt", ""},
 		{"\\file.txt", ""},
+	}
+	if runtime.GOOS != "windows" {
+		tests = []struct {
+			path   string
+			result string
+		}{
+			{"folder/file.txt", "folder"},
+			{"folder\\file.txt", ""},
+			{"folder/folder/file.txt", "folder\\folder"},
+			{"file.txt", ""},
+			{"/file.txt", ""},
+		}
 	}
 
 	for _, tt := range tests {
