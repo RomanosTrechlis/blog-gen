@@ -66,7 +66,7 @@ func TestCopyDir(t *testing.T) {
 }
 
 func TestGetFilenameFrom(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		path   string
 		result string
 	}{
@@ -98,7 +98,7 @@ func TestGetFilenameFrom(t *testing.T) {
 }
 
 func TestGetFolderNameFrom(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		path   string
 		result string
 	}{
