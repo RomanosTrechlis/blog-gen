@@ -5,7 +5,7 @@ const (
 	getPostsLongHelp  = `
 Downloads posts from a given datasource inside the config.json file.
 
-The folowing part of config.json controls the behavior of "fetch-posts"
+The following part of config.json controls the behavior of "fetch-posts"
 command.
 
 "DataSource": {
@@ -21,7 +21,7 @@ The "TempFolder" is were the posts will be cloned for generation.
 	getThemeShortHelp = `Downloads theme from given datasource`
 	getThemeLongHelp  = `
 Downloads theme from a given datasource inside the config.json file.
-The folowing part of config.json controls the behavior of "fetch-posts"
+The following part of config.json controls the behavior of "fetch-posts"
 command.
 
 "ThemeFolder": "./static/",

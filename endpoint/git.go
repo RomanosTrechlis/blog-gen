@@ -71,7 +71,7 @@ func (ds *gitEndpoint) Upload(destFolder, endpointUsername, endpointPassword, en
 	cmd.Dir = dest
 	err = cmd.Run()
 	if err != nil {
-		return fmt.Errorf("error commiting files: %v", err)
+		return fmt.Errorf("error committing files: %v", err)
 	}
 
 	pushArgs := []string{"push", "origin", "master"}
