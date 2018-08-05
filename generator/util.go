@@ -5,6 +5,8 @@ import (
 	"html/template"
 	"os"
 	"strings"
+
+	"github.com/RomanosTrechlis/blog-gen/util/fs"
 )
 
 func clearAndCreateDestination(path string) (err error) {
@@ -14,7 +16,7 @@ func clearAndCreateDestination(path string) (err error) {
 			return fmt.Errorf("error removing folder at destination %s: %v ", path, err)
 		}
 	}
-	return os.Mkdir(path, os.ModePerm)
+	return fs.CreateFolderIfNotExist(path)
 }
 
 func getTemplate(path string) (t *template.Template, err error) {
