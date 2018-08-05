@@ -90,13 +90,13 @@ func (g *siteGenerator) newPost(path string) (p *post, err error) {
 }
 
 func (g *siteGenerator) getPostMeta(path string) (*Meta, error) {
-	filePath := fmt.Sprintf("%s/meta.yml", path)
-	metaraw, err := ioutil.ReadFile(filePath)
+	filePath := filepath.Join(path, "meta.yml")
+	b, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("error while reading file %s: %v", filePath, err)
 	}
 	meta := Meta{}
-	err = yaml.Unmarshal(metaraw, &meta)
+	err = yaml.Unmarshal(b, &meta)
 	if err != nil {
 		return nil, fmt.Errorf("error reading yml in %s: %v", filePath, err)
 	}
@@ -125,7 +125,7 @@ func (g *siteGenerator) createTasks(posts []*post, t *template.Template) []Gener
 	for i := 0; i < numOfPages; i++ {
 		to := destination
 		if i != 0 {
-			to = fmt.Sprintf("%s/%d", destination, i+1)
+			to = filepath.Join(destination, fmt.Sprintf("%d", i+1))
 		}
 		toP := (i + 1) * paging
 		if (i + 1) == numOfPages {
@@ -136,7 +136,7 @@ func (g *siteGenerator) createTasks(posts []*post, t *template.Template) []Gener
 	}
 
 	// archive
-	ag := listingGenerator{posts, t, g.SiteInfo, fmt.Sprintf("%s/archive", destination), "Archive", 0, 0}
+	ag := listingGenerator{posts, t, g.SiteInfo, filepath.Join(destination, "archive"), "Archive", 0, 0}
 	// tags
 	tg := tagsGenerator{
 		tagPostsMap: tagPostsMap,

@@ -33,7 +33,7 @@ func (g *tagsGenerator) Generate() (err error) {
 	siteInfo := g.siteInfo
 
 	tagPostsMap := g.tagPostsMap
-	tagsPath := fmt.Sprintf("%s/tags", siteInfo.DestFolder)
+	tagsPath := filepath.Join(siteInfo.DestFolder, "tags")
 	err = clearAndCreateDestination(tagsPath)
 	if err != nil {
 		return err
@@ -88,7 +88,7 @@ func (g *tagsGenerator) generateTagIndex() (err error) {
 }
 
 func (g *tagsGenerator) generateTagPage(tag string, posts []*post) (err error) {
-	tagPagePath := fmt.Sprintf("%s/%s/%s", g.siteInfo.DestFolder, "tags", tag)
+	tagPagePath := filepath.Join(g.siteInfo.DestFolder, "tags", tag)
 	err = clearAndCreateDestination(tagPagePath)
 	if err != nil {
 		return err

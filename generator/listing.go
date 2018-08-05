@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
-	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/RomanosTrechlis/blog-gen/config"
+	"github.com/RomanosTrechlis/blog-gen/util/fs"
 )
 
 // ListingData holds the data for the listing page
@@ -58,7 +58,7 @@ func (g *listingGenerator) Generate() (err error) {
 	}
 	htmlBlocks := template.HTML(strings.Join(postBlocks, "<br />"))
 	if g.pageNum > 1 {
-		err := os.Mkdir(g.destination, os.ModePerm)
+		err := fs.CreateFolderIfNotExist(g.destination)
 		if err != nil {
 			return fmt.Errorf("error creating directory at %s: %v", g.destination, err)
 		}

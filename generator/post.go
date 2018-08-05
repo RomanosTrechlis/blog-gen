@@ -93,8 +93,8 @@ func (g *postGenerator) copyAdditionalArtifacts(path, postName string) (err erro
 }
 
 func (*postGenerator) copyImagesDir(source, destination string) (err error) {
-	path := fmt.Sprintf("%s/images", destination)
-	err = os.Mkdir(path, os.ModePerm)
+	path := filepath.Join(destination, "images")
+	err = fs.CreateFolderIfNotExist(path)
 	if err != nil {
 		return fmt.Errorf("error creating images directory at %s: %v", path, err)
 	}
@@ -113,7 +113,7 @@ func (*postGenerator) copyImagesDir(source, destination string) (err error) {
 }
 
 func getHTML(path string) (html []byte, err error) {
-	filePath := fmt.Sprintf("%s/post.md", path)
+	filePath := filepath.Join(path, "post.md")
 	input, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("error while reading file %s: %v", filePath, err)
@@ -128,7 +128,7 @@ func getHTML(path string) (html []byte, err error) {
 }
 
 func getImages(path string) (dirPath string, images []string, err error) {
-	dirPath = fmt.Sprintf("%s/images", path)
+	dirPath = filepath.Join(path, "images")
 	files, err := ioutil.ReadDir(dirPath)
 	if err != nil {
 		if os.IsNotExist(err) {

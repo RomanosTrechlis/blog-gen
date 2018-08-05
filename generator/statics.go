@@ -98,6 +98,5 @@ func (g *staticsGenerator) resolveTemplateToFile() error {
 func getTitle(path string) (title string) {
 	fileName := path[strings.LastIndex(path, fs.GetSeparator())+1 : strings.LastIndex(path, ".")]
 	title = fmt.Sprintf("%s%s", strings.ToUpper(string(fileName[0])), fileName[1:])
-	fmt.Println(title)
 	return title
 }
