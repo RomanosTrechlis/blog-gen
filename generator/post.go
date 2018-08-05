@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/RomanosTrechlis/blog-generator/config"
-	"github.com/RomanosTrechlis/blog-generator/util/fs"
+	"github.com/RomanosTrechlis/blog-gen/config"
+	"github.com/RomanosTrechlis/blog-gen/util/fs"
 	"github.com/russross/blackfriday"
 	"github.com/sourcegraph/syntaxhighlight"
 )

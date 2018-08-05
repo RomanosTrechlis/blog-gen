@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/RomanosTrechlis/blog-generator/config"
+	"github.com/RomanosTrechlis/blog-gen/config"
 	"github.com/beevik/etree"
 )
 

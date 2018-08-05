@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/RomanosTrechlis/blog-generator/config"
+	"github.com/RomanosTrechlis/blog-gen/config"
 )
 
 // ListingData holds the data for the listing page

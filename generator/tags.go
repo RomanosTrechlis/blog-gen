@@ -6,7 +6,7 @@ import (
 	"html/template"
 	"sort"
 
-	"github.com/RomanosTrechlis/blog-generator/config"
+	"github.com/RomanosTrechlis/blog-gen/config"
 )
 
 // Tag holds the data for a Tag

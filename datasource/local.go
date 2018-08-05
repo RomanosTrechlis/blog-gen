@@ -3,7 +3,7 @@ package datasource
 import (
 	"fmt"
 
-	"github.com/RomanosTrechlis/blog-generator/util/fs"
+	"github.com/RomanosTrechlis/blog-gen/util/fs"
 )
 
 // localDataSource is the local data source object

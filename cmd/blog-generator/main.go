@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/RomanosTrechlis/blog-generator/config"
+	"github.com/RomanosTrechlis/blog-gen/config"
 	"github.com/RomanosTrechlis/go-icls/cli"
 )
 

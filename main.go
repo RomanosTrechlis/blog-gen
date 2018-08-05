@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/RomanosTrechlis/blog-generator/cli"
+	"github.com/RomanosTrechlis/blog-gen/cli"
 )
 
 var (

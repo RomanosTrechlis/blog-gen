@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/RomanosTrechlis/blog-generator/config"
-	"github.com/RomanosTrechlis/blog-generator/util/fs"
+	"github.com/RomanosTrechlis/blog-gen/config"
+	"github.com/RomanosTrechlis/blog-gen/util/fs"
 )
 
 // staticsGenerator object

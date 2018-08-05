@@ -6,7 +6,7 @@ import (
 
 	"strings"
 
-	"github.com/RomanosTrechlis/blog-generator/util/fs"
+	"github.com/RomanosTrechlis/blog-gen/util/fs"
 )
 
 // gitEndpoint is the git endpoint object

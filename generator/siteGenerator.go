@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/RomanosTrechlis/blog-generator/config"
+	"github.com/RomanosTrechlis/blog-gen/config"
 	"gopkg.in/yaml.v2"
 )
 

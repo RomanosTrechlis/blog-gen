@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/RomanosTrechlis/blog-generator/config"
+	"github.com/RomanosTrechlis/blog-gen/config"
 )
 
 // Category holds the data for a category

@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/RomanosTrechlis/blog-generator/config"
-	"github.com/RomanosTrechlis/blog-generator/datasource"
-	"github.com/RomanosTrechlis/blog-generator/generator"
-	"github.com/RomanosTrechlis/blog-generator/util/fs"
+	"github.com/RomanosTrechlis/blog-gen/config"
+	"github.com/RomanosTrechlis/blog-gen/datasource"
+	"github.com/RomanosTrechlis/blog-gen/generator"
+	"github.com/RomanosTrechlis/blog-gen/util/fs"
 	"github.com/RomanosTrechlis/go-icls/cli"
 )
 
