@@ -3,6 +3,7 @@ package config_test
 import (
 	"testing"
 	"github.com/RomanosTrechlis/blog-gen/config"
+	"path/filepath"
 )
 
 func TestNew(t *testing.T) {
@@ -10,9 +11,9 @@ func TestNew(t *testing.T) {
 		file string
 		err bool
 	} {
-		{"testdata\\config.json", false},
-		{"testdata\\nofile.json", true},
-		{"testdata\\configFillValues.json", false},
+		{filepath.Join("testdata", "config.json"), false},
+		{filepath.Join("testdata", "nofile.json"), true},
+		{filepath.Join("testdata", "configFillValues.json"), false},
 	}
 
 	for _, tt := range tests {
