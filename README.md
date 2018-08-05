@@ -1,6 +1,10 @@
 # static-site-generator
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/RomanosTrechlis/blog-generator)](https://goreportcard.com/report/github.com/RomanosTrechlis/blog-generator)
+[![Build Status](https://travis-ci.org/RomanosTrechlis/blog-gen.svg?branch=master)](https://travis-ci.org/RomanosTrechlis/blog-gen)
+[![Go Report Card](https://goreportcard.com/badge/github.com/RomanosTrechlis/blog-gen)](https://goreportcard.com/report/github.com/RomanosTrechlis/blog-gen)
+[![codecov](https://codecov.io/gh/RomanosTrechlis/blog-gen/branch/master/graph/badge.svg)](https://codecov.io/gh/RomanosTrechlis/blog-gen)
+
+
 
 For this project I used the core ideas of [Mario Zupan's](https://zupzup.org/) blog generator and altered them to fit my needs.
 
